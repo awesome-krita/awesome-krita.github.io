@@ -2,7 +2,7 @@
 
 A list of plugins, themes and tools for Krita. Every entry is checked by hand before it goes in.
 
-**Browse the list: https://emarpiee.github.io/awesome-krita/**
+**Browse the list: https://awesome-krita.github.io/**
 
 > **Note:** This is a small, hand-kept list. It is not a full index of everything made for Krita.
 

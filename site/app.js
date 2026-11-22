@@ -151,7 +151,7 @@ function link(cls, href, iconName, label, title) {
 // owner.github.io/repo -> github.com/owner/repo, and owner.github.io -> github.com/owner/owner.github.io.
 const REPO = (() => {
   const m = location.hostname.match(/^([\w-]+)\.github\.io$/i);
-  if (!m) return "https://github.com/emarpiee/awesome-krita"; // local preview
+  if (!m) return "https://github.com/awesome-krita/awesome-krita.github.io"; // local preview
   const first = location.pathname.split("/")[1];
   const repo = first && !first.includes(".") ? first : location.hostname; // "/index.html" is not a repo
   return `https://github.com/${m[1]}/${repo}`;
