@@ -4,5 +4,5 @@
 
 
 - [ ] One new file in `entries/`, named like `shortcut-composer.toml`
-- [ ] It works in a current version of Krita
+- [ ] `krita` and `os` list only the versions and systems it was actually tested on
 - [ ] The download is free and needs no account

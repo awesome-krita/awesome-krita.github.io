@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Write a new entry file from one or two links.
 
-python3 scripts/add.py LINK [LINK] --type plugin --category color
+python3 scripts/add.py LINK [LINK] --type plugin --category color --krita 5.3 6 --os Linux Windows
 python3 scripts/add.py --issue-body FILE     (used by the submission form)
 
 LINK is a GitHub repo, a Krita Artists topic, or one of each.
@@ -23,15 +23,22 @@ def parse_issue(body):
     for m in re.finditer(r"^### (.+?)\s*\n(.*?)(?=^### |\Z)", body, re.S | re.M):
         value = m[2].strip()
         answers[m[1].strip()] = "" if value == NO_ANSWER else value
+    split = lambda s: [v.strip() for v in s.split(",") if v.strip()]  # multi-select answers are "a, b"
     return {
         "links": [answers.get("GitHub repo", ""), answers.get("Krita Artists topic", "")],
         "type": answers.get("Type", "").lower(),
         "category": answers.get("Category", "").lower(),
+        "krita": split(answers.get("Tested in Krita", "")),
+        "os": split(answers.get("Tested on", "")),
     }
 
 
-def make_entry(links, type_, category):
+def make_entry(links, type_, category, krita=(), os=()):
     entry = {"type": type_, "category": category}
+    if krita:
+        entry["krita"] = list(krita)
+    if os:
+        entry["os"] = list(os)
     for link in filter(None, (l.strip() for l in links)):
         if build.REPO_RE.match(link):
             entry["repo"] = link.rstrip("/")
@@ -47,8 +54,10 @@ def file_name(name):
 
 
 def to_toml(entry):
-    order = ["repo", "forum", "type", "category"]
-    return "".join(f'{k} = "{entry[k]}"\n' for k in order if k in entry)
+    def value(v):
+        return "[" + ", ".join(f'"{x}"' for x in v) + "]" if isinstance(v, list) else f'"{v}"'
+    order = ["repo", "forum", "type", "category", "krita", "os"]
+    return "".join(f"{k} = {value(entry[k])}\n" for k in order if k in entry)
 
 
 def main():
@@ -56,14 +65,18 @@ def main():
     p.add_argument("links", nargs="*")
     p.add_argument("--type", default="plugin")
     p.add_argument("--category", default="other")
+    p.add_argument("--krita", nargs="+", default=[], help=f"tested Krita versions: {', '.join(build.KRITA)}")
+    p.add_argument("--os", nargs="+", default=[], help=f"tested systems: {', '.join(build.SYSTEMS)}")
     p.add_argument("--issue-body")
     args = p.parse_args()
 
     if args.issue_body:
         answers = parse_issue(Path(args.issue_body).read_text(encoding="utf-8"))
-        entry = make_entry(answers["links"], answers["type"], answers["category"])
+        if not answers["krita"] or not answers["os"]:
+            raise SystemExit("Pick at least one Krita version and one system it was tested on.")
+        entry = make_entry(answers["links"], answers["type"], answers["category"], answers["krita"], answers["os"])
     else:
-        entry = make_entry(args.links, args.type, args.category)
+        entry = make_entry(args.links, args.type, args.category, args.krita, args.os)
 
     stem = "new-entry"
     errors = build.validate(entry, stem)

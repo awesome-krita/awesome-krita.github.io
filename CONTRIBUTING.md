@@ -11,9 +11,11 @@ repo = "https://github.com/wojtryb/Shortcut-Composer"
 forum = "https://krita-artists.org/t/shortcut-composer/12345"
 type = "plugin"
 category = "workflow"
+krita = ["5.3", "6"]
+os = ["Windows", "Linux"]
 ```
 
-You need `type`, `category`, and at least one of `repo` or `forum`. Everything else is read from those links.
+You need `type`, `category`, `krita`, `os`, and at least one of `repo` or `forum`. Everything else is read from those links.
 
 **Keys**
 
@@ -28,9 +30,12 @@ You need `type`, `category`, and at least one of `repo` or `forum`. Everything e
 | `author` | No | Use when the repo owner isn't the person who made it |
 | `download` | No | Use when the download isn't on GitHub or in the forum post |
 | `image` | No | A picture link, when the README's first picture isn't a good preview |
-| `krita` | No | Which Krita versions it works on, like `"5.2+"` |
+| `krita` | Yes, for new entries | Krita versions it was tested in. Any of `"6"`, `"5.3"`, `"5.2"`, `"5.1 or older"` |
+| `os` | Yes, for new entries | Systems it was tested on. Any of `"Windows"`, `"macOS"`, `"Linux"`, `"Android"` |
 
-All values are text in quotes.
+`krita` and `os` are lists, like `krita = ["5.3", "6"]`. Everything else is text in quotes.
+
+Only list what was actually tried. "Tested on Linux" with a working plugin is more useful than "Windows, macOS, Linux" that nobody checked.
 
 **Writing descriptions**
 
@@ -44,7 +49,7 @@ Every pull request runs these. A ❌ on the pull request means one failed. Click
 | Check | What it catches |
 |---|---|
 | File name | Capital letters, spaces or underscores in the name |
-| Keys | Missing `type` or `category`, unknown keys, a type or category that isn't on the list |
+| Keys | Missing `type` or `category`, unknown keys, a type, category, Krita version or system that isn't on the list |
 | Links | A `repo` that isn't a GitHub repo, a `forum` that isn't a Krita Artists topic, a download link that doesn't work |
 | Duplicates | Something that's already listed, by repo or by forum topic |
 | Description | Longer than 160 characters |

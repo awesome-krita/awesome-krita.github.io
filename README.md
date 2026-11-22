@@ -11,14 +11,14 @@ A list of plugins, themes and tools for Krita. Every entry is checked by hand be
 You only need a link.
 
 1. Open a [new submission](https://github.com/emarpiee/awesome-krita/issues/new?template=submit.yml).
-2. Paste the GitHub repo, the Krita Artists topic, or both. Pick a type and a category.
+2. Paste the GitHub repo, the Krita Artists topic, or both. Pick a type, a category, and the Krita versions and systems it was tested on.
 3. A pull request is opened for you. If a link doesn't work, a comment on your issue says what to fix.
 
 You can also open a pull request yourself. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## What gets in
 
-- It works in a current version of Krita.
+- It says which Krita versions and systems (Windows, macOS, Linux, Android) it was tested on.
 - The download is free and needs no account.
 - It has a GitHub repo or a Krita Artists topic. Repos without releases are fine.
 - It's not already listed.

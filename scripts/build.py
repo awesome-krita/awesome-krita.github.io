@@ -33,7 +33,10 @@ CATEGORIES = {
     "effects": "Effects",
     "other": "Other",
 }
-KEYS = {"repo", "forum", "type", "category", "name", "description", "author", "download", "image", "krita"}
+KRITA = ["6", "5.3", "5.2", "5.1 or older"]
+SYSTEMS = ["Windows", "macOS", "Linux", "Android"]
+LISTS = {"krita": KRITA, "os": SYSTEMS}  # keys that hold a list of choices
+KEYS = {"repo", "forum", "type", "category", "name", "description", "author", "download", "image", *LISTS}
 MAX_DESCRIPTION = 160
 
 REPO_RE = re.compile(r"^https://github\.com/([\w.-]+)/([\w.-]+?)(?:\.git)?/?$")
@@ -54,7 +57,12 @@ def validate(entry, stem):
     if unknown:
         errors.append(f"unknown keys: {', '.join(unknown)}. Allowed: {', '.join(sorted(KEYS))}")
     for key, value in entry.items():
-        if not isinstance(value, str):
+        if key in LISTS:
+            allowed = LISTS[key]
+            if not isinstance(value, list) or not value or any(v not in allowed for v in value):
+                choices = ", ".join(f'"{v}"' for v in allowed)
+                errors.append(f"`{key}` must be a list with some of: {choices}. Example: {key} = [{choices.split(', ')[0]}]")
+        elif not isinstance(value, str):
             errors.append(f"`{key}` must be text in quotes")
     if errors:
         return errors
@@ -245,6 +253,9 @@ def fetch(entry):
     info.pop("repo_in_post", None)
     info["download"] = info.get("download") or info.get("forum")
     info.update(entry)
+    for key, order in LISTS.items():
+        if key in info:
+            info[key] = sorted(set(info[key]), key=order.index)
     return {k: v for k, v in info.items() if v not in (None, "")}
 
 
@@ -276,6 +287,7 @@ def main():
         "generated": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
         "types": TYPES,
         "categories": CATEGORIES,
+        "systems": SYSTEMS,
         "entries": out,
     }
     OUT.write_text(json.dumps(data, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")

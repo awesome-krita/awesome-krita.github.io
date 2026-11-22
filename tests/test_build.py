@@ -54,7 +54,13 @@ class Validate(unittest.TestCase):
         self.assertIn("unknown keys: stars", self.check(GOOD | {"stars": "5"})[0])
 
     def test_values_must_be_text(self):
-        self.assertIn("must be text", self.check(GOOD | {"krita": 5.2})[0])
+        self.assertIn("must be text", self.check(GOOD | {"name": 5.2})[0])
+
+    def test_tested_lists(self):
+        self.assertEqual(self.check(GOOD | {"krita": ["5.3", "6"], "os": ["Linux", "Windows"]}), [])
+        for bad in [{"krita": "5.3"}, {"krita": []}, {"krita": ["5.4"]}, {"os": ["linux"]}, {"os": ["Windows", 10]}]:
+            with self.subTest(bad):
+                self.assertIn("must be a list", self.check(GOOD | bad)[0])
 
     def test_description_length(self):
         self.assertTrue(self.check(GOOD | {"description": "x" * 161}))
@@ -120,6 +126,14 @@ Plugin
 
 Workflow
 
+### Tested in Krita
+
+5.3, 6
+
+### Tested on
+
+Windows, Linux
+
 ### Anything else?
 
 hi
@@ -129,10 +143,17 @@ hi
         answers = add.parse_issue(self.BODY)
         self.assertEqual(answers["links"], ["https://github.com/wojtryb/Shortcut-Composer", ""])
         self.assertEqual((answers["type"], answers["category"]), ("plugin", "workflow"))
+        self.assertEqual((answers["krita"], answers["os"]), (["5.3", "6"], ["Windows", "Linux"]))
 
     def test_make_entry(self):
         a = add.parse_issue(self.BODY)
-        self.assertEqual(add.make_entry(a["links"], a["type"], a["category"]), GOOD)
+        entry = add.make_entry(a["links"], a["type"], a["category"], a["krita"], a["os"])
+        self.assertEqual(entry, GOOD | {"krita": ["5.3", "6"], "os": ["Windows", "Linux"]})
+        self.assertEqual(build.validate(entry, "x"), [])
+
+    def test_toml_round_trip(self):
+        entry = GOOD | {"krita": ["5.3", "6"], "os": ["Linux"]}
+        self.assertEqual(build.tomllib.loads(add.to_toml(entry)), entry)
 
     def test_bad_link(self):
         with self.assertRaises(SystemExit):

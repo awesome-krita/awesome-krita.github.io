@@ -60,7 +60,9 @@ function row(entry) {
     entry.version && el("li", { text: entry.version }),
     entry.license && el("li", { text: entry.license }),
     entry.stars != null && el("li", { text: `${entry.stars} stars` }),
-    entry.krita && el("li", { text: `Krita ${entry.krita}` }),
+    (entry.krita || entry.os) && el("li", { text: ["Tested",
+      entry.krita && `in Krita ${entry.krita.join(", ")}`,
+      entry.os && `on ${entry.os.join(", ")}`].filter(Boolean).join(" ") }),
     entry.updated && el("li", { text: `Updated ${formatDate(entry.updated)}` }),
     entry.archived && el("li", { class: "archived", text: "Archived" }),
   );

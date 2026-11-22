@@ -32,17 +32,33 @@ body:
       options: [Color, Workflow, Layers, Reference, Animation, Export, Effects, Other]
     validations:
       required: true
+  - type: dropdown
+    id: krita
+    attributes:
+      label: Tested in Krita
+      description: Every version you or the author tried it in. Pick all that apply.
+      multiple: true
+      options: ["6", "5.3", "5.2", "5.1 or older"]
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Tested on
+      description: Every system you or the author tried it on. Pick all that apply.
+      multiple: true
+      options: [Windows, macOS, Linux, Android]
+    validations:
+      required: true
   - type: textarea
     id: notes
     attributes:
       label: Anything else?
-      description: Optional. For example which Krita versions it works on.
+      description: Optional. For example known problems, or what didn't work on a system.
   - type: checkboxes
     id: rules
     attributes:
       label: Before you send
       options:
-        - label: It works in a current version of Krita.
-          required: true
         - label: The download is free and needs no account.
           required: true
