@@ -2,7 +2,7 @@ name: Check
 
 on:
   pull_request:
-  workflow_dispatch: # started by the Submission workflow for the pull requests it opens
+  workflow_dispatch: # run it by hand from the Actions tab
 
 permissions:
   contents: read

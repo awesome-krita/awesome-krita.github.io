@@ -89,7 +89,6 @@ python3 -m http.server -d site                                            # prev
 **One-time GitHub setup**
 
 - *Settings > Pages*: set the source to *GitHub Actions*.
-- *Settings > Actions > General*: allow GitHub Actions to create pull requests (for the forms). In an organization, turn it on in the organization's Actions settings first.
+- The forms open pull requests as the organization's bot app. Its App ID and private key are the repository secrets `BOT_APP_ID` and `BOT_PRIVATE_KEY`. The app needs read and write access to contents, pull requests and issues, and must be installed on this repository.
 - *Settings > Rules > Rulesets*: a ruleset on the default branch that restricts deletions, blocks force pushes, requires the `check` status check and one approving review from code owners (the `maintainers` team, see `.github/CODEOWNERS`). *Organization admin* is on the bypass list (*Always allow*), so owners can push small fixes straight to `main`.
-- Pull requests opened by the forms don't start workflows by themselves, so the *Submission* workflow starts *Check* on them.
 - *Settings > Security*: turn on private vulnerability reporting, for reports about harmful entries.

@@ -1,17 +1,15 @@
 name: Submission
 
 # Turns a filled-in "Add" or "Suggest an edit" form into a pull request.
-# Needs: Settings > Actions > General > "Allow GitHub Actions to create and approve pull requests".
+# It acts as the organization's bot app (secrets BOT_APP_ID and BOT_PRIVATE_KEY), so the pull requests
+# it opens run the Check workflow like any other, without a maintainer approving the run first.
 # Reports are labelled by their form and reviewed by hand, so they don't run anything.
 on:
   issues:
     types: [opened, edited]
 
 permissions:
-  contents: write
-  pull-requests: write
-  issues: write
-  actions: write # to start the Check workflow on the new pull request
+  contents: read # everything that writes uses the bot app's token
 
 jobs:
   pull-request:
@@ -20,16 +18,26 @@ jobs:
       (contains(github.event.issue.labels.*.name, 'submission') || contains(github.event.issue.labels.*.name, 'edit'))
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ github.token }}
-      GITHUB_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }} # read-only, for GitHub's API limits in the build
       NUMBER: ${{ github.event.issue.number }}
       BODY: ${{ github.event.issue.body }}
       LOGIN: ${{ github.event.issue.user.login }}
       KIND: ${{ contains(github.event.issue.labels.*.name, 'edit') && 'edit' || 'submission' }}
     steps:
+      - name: Act as the bot app
+        id: bot
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_PRIVATE_KEY }}
+
       - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.bot.outputs.token }}
 
       - name: Write the entry
+        env:
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
         run: |
           printf '%s' "$BODY" > "$RUNNER_TEMP/body.md"
           if [ "$KIND" = edit ]; then
@@ -56,6 +64,8 @@ jobs:
         run: python3 -m unittest discover -s tests && python3 scripts/build.py
 
       - name: Open or update the pull request
+        env:
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
         run: |
           IFS=$'\t' read -r path name author < "$RUNNER_TEMP/result.txt"
           verb=add
@@ -71,8 +81,6 @@ jobs:
             gh pr create --head "$branch" --title "$verb: $name" --body "From #$NUMBER. Closes #$NUMBER."
             gh issue comment "$NUMBER" --body "Thanks. This is in a pull request now and will be reviewed by hand."
           fi
-          # Pull requests opened here don't start other workflows by themselves, so start the checks.
-          gh workflow run check.yml --ref "$branch"
           if [ "$author" = author ]; then
             gh issue edit "$NUMBER" --add-label author
           fi
