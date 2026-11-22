@@ -89,7 +89,7 @@ python3 -m http.server -d site                                            # prev
 **One-time GitHub setup**
 
 - *Settings > Pages*: set the source to *GitHub Actions*.
-- *Settings > Actions > General*: allow GitHub Actions to create pull requests (for the submission form).
-- *Settings > Rules > Rulesets*: a ruleset on the default branch that restricts deletions, blocks force pushes and requires the `check` status check. Add *Repository admin* to the bypass list (*Always allow*), or direct pushes to `main` get rejected.
+- *Settings > Actions > General*: allow GitHub Actions to create pull requests (for the forms). In an organization, turn it on in the organization's Actions settings first.
+- *Settings > Rules > Rulesets*: a ruleset on the default branch that restricts deletions, blocks force pushes, requires the `check` status check and one approving review from code owners (the `maintainers` team, see `.github/CODEOWNERS`). *Organization admin* is on the bypass list (*Always allow*), so owners can push small fixes straight to `main`.
 - Pull requests opened by the forms don't start workflows by themselves, so the *Submission* workflow starts *Check* on them.
 - *Settings > Security*: turn on private vulnerability reporting, for reports about harmful entries.
