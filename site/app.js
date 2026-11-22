@@ -10,10 +10,20 @@ const FACETS = [
   { key: "os", label: "Tested on", options: (d) => labels(d.systems) },
 ];
 
-// Icons: download and github from Lucide (ISC license), krita from Simple Icons (CC0).
+// Icons from Lucide (ISC license), except krita from Simple Icons (CC0). Copied from their SVG files.
 const ICONS = {
   download: { stroke: true, d: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>' },
   github: { stroke: true, d: '<path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/>' },
+  plug: { stroke: true, d: '<path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/>' },
+  palette: { stroke: true, d: '<circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>' },
+  brush: { stroke: true, d: '<path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"/>' },
+  wrench: { stroke: true, d: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>' },
+  package: { stroke: true, d: '<path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"/><path d="m7.5 4.27 9 5.15"/>' },
+  tag: { stroke: true, d: '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>' },
+  scale: { stroke: true, d: '<path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>' },
+  star: { stroke: true, d: '<path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>' },
+  calendar: { stroke: true, d: '<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>' },
+  monitor: { stroke: true, d: '<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>' },
   krita: { stroke: false, d: '<path d="M.652.76a.625.625 0 00-.5.246c-.352.448-.035.898.362 1.262.206.189 1.77 1.794 3.428 3.527a11.054 11.054 0 011.815-1.983C3.667 2.515 1.694 1.266 1.461 1.1 1.201.914.917.762.652.76zm5.105 3.052c1.848 1.148 3.786 2.332 4.693 2.84 1.469.821 3.758 2.684 4.092 4.434.535.466 2.182 1.916 2.596 2.413.698-.211 1.518.133 2.06 1.12.866 1.583.227 3.747-1.968 4.988a5.42 5.42 0 01-.296.267l.296-.267c1.14-1.468-.714-2.44-1.175-3.864a2.06 2.06 0 01-.11-.78c-.533-.282-2.11-1.452-2.795-1.965-1.801.16-4.207-1.773-5.35-3.08-.7-.802-2.32-2.517-3.858-4.123a11.052 11.052 0 00-2.046 6.393A11.052 11.052 0 1012.948 1.136c-2.64.004-5.19.954-7.19 2.676zm8.71 7.552c-.515.126-.968.831-1.118 1.306-.038.115-.04.303.066.342.802.592 1.556 1.168 2.4 1.7.162-.393.746-.963 1.096-1.2zm-11.53 1.639c.812 1.898 5.798 7.17 12.06 2.695a2.07 2.07 0 00.114.715c.46 1.42 2.36 2.427 1.238 3.89-2.135 1.364-5 1.201-6.989.528-3.558-1.204-5.914-4.332-6.424-7.828zm13.782.7a.771.771 0 00-.065.049c-.004.003-.008.008-.011.008.003-.003.007-.008.01-.008.024-.015.044-.034.066-.048z"/>' },
 };
 
@@ -40,8 +50,10 @@ function el(tag, attrs = {}, ...children) {
 const swatch = (cat) => el("span", { class: "swatch", style: `--sw: var(--${cat})`, "aria-hidden": "true" });
 const valuesOf = (entry, key) => [].concat(entry[key] ?? []);
 
+const TYPE_ICONS = { plugin: "plug", theme: "palette", brushes: "brush", tool: "wrench", resource: "package" };
+
 function formatDate(iso) {
-  return new Date(iso + "T00:00:00").toLocaleDateString(undefined, { year: "numeric", month: "short" });
+  return new Date(iso + "T00:00:00").toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 }
 
 // --- one entry ---------------------------------------------------------------
@@ -77,18 +89,21 @@ function thumb(entry) {
 }
 
 function chips(entry) {
-  const tested = (entry.krita || entry.os) && ["Tested",
-    entry.krita && `in Krita ${entry.krita.join(", ")}`,
-    entry.os && `on ${entry.os.join(", ")}`].filter(Boolean).join(" ");
+  // Icon plus value; `meaning` is the hover text and what screen readers say.
   // "minor" chips are left out of the grid view to keep cards short.
+  const chip = (iconName, value, meaning, cls = "") =>
+    el("li", { class: `chip ${cls}`.trim(), title: meaning }, icon(iconName),
+      el("span", { class: "visually-hidden", text: `${meaning}: ` }), el("span", { text: value }));
+  const typeName = entry.type[0].toUpperCase() + entry.type.slice(1);
   return el("ul", { class: "chips", "aria-label": "Details" },
-    ...entry.category.map((c) => el("li", { class: "chip cat" }, swatch(c), data.categories[c] || c)),
-    el("li", { class: "chip", text: entry.type[0].toUpperCase() + entry.type.slice(1) }),
-    entry.version && el("li", { class: "chip", text: entry.version }),
-    entry.license && el("li", { class: "chip minor", text: entry.license }),
-    entry.stars != null && el("li", { class: "chip minor", text: `${entry.stars} ${entry.stars === 1 ? "star" : "stars"}` }),
-    tested && el("li", { class: "chip minor", text: tested }),
-    entry.updated && el("li", { class: "chip minor", text: `Updated ${formatDate(entry.updated)}` }),
+    ...entry.category.map((c) => el("li", { class: "chip cat", title: "Category" }, swatch(c), data.categories[c] || c)),
+    chip(TYPE_ICONS[entry.type] || "package", typeName, "Type"),
+    entry.version && chip("tag", entry.version.replace(/^v(?=\d)/i, ""), "Version"),
+    entry.license && chip("scale", entry.license, "License", "minor"),
+    entry.stars != null && chip("star", String(entry.stars), "GitHub stars", "minor"),
+    entry.krita && chip("krita", entry.krita.join(", "), "Tested in Krita", "minor"),
+    entry.os && chip("monitor", entry.os.join(", "), "Tested on", "minor"),
+    entry.updated && chip("calendar", formatDate(entry.updated), "Last updated", "minor"),
     entry.archived && el("li", { class: "chip warn", text: "Archived" }),
   );
 }

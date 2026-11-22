@@ -230,6 +230,7 @@ button.thumb { cursor: pointer; }
   color: var(--muted);
 }
 .chip.cat { color: var(--ink); }
+.chip .icon { width: 0.875rem; height: 0.875rem; }
 .chip.warn { color: var(--color); border-color: currentColor; font-weight: 500; }
 
 /* Grid view, only wider than a phone */
