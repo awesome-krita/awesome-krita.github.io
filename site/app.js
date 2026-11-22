@@ -24,6 +24,8 @@ const ICONS = {
   star: { stroke: true, d: '<path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>' },
   calendar: { stroke: true, d: '<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>' },
   monitor: { stroke: true, d: '<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>' },
+  flag: { stroke: true, d: '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/>' },
+  pencil: { stroke: true, d: '<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/>' },
   krita: { stroke: false, d: '<path d="M.652.76a.625.625 0 00-.5.246c-.352.448-.035.898.362 1.262.206.189 1.77 1.794 3.428 3.527a11.054 11.054 0 011.815-1.983C3.667 2.515 1.694 1.266 1.461 1.1 1.201.914.917.762.652.76zm5.105 3.052c1.848 1.148 3.786 2.332 4.693 2.84 1.469.821 3.758 2.684 4.092 4.434.535.466 2.182 1.916 2.596 2.413.698-.211 1.518.133 2.06 1.12.866 1.583.227 3.747-1.968 4.988a5.42 5.42 0 01-.296.267l.296-.267c1.14-1.468-.714-2.44-1.175-3.864a2.06 2.06 0 01-.11-.78c-.533-.282-2.11-1.452-2.795-1.965-1.801.16-4.207-1.773-5.35-3.08-.7-.802-2.32-2.517-3.858-4.123a11.052 11.052 0 00-2.046 6.393A11.052 11.052 0 1012.948 1.136c-2.64.004-5.19.954-7.19 2.676zm8.71 7.552c-.515.126-.968.831-1.118 1.306-.038.115-.04.303.066.342.802.592 1.556 1.168 2.4 1.7.162-.393.746-.963 1.096-1.2zm-11.53 1.639c.812 1.898 5.798 7.17 12.06 2.695a2.07 2.07 0 00.114.715c.46 1.42 2.36 2.427 1.238 3.89-2.135 1.364-5 1.201-6.989.528-3.558-1.204-5.914-4.332-6.424-7.828zm13.782.7a.771.771 0 00-.065.049c-.004.003-.008.008-.011.008.003-.003.007-.008.01-.008.024-.015.044-.034.066-.048z"/>' },
 };
 
@@ -144,6 +146,21 @@ function link(cls, href, iconName, label, title) {
   return el("a", { class: cls, href, title: title || label }, icon(iconName), el("span", { class: "label", text: label }));
 }
 
+// The flag button: opens a GitHub issue form with this entry filled in.
+const ISSUES = "https://github.com/emarpiee/awesome-krita/issues/new";
+
+function feedback(entry) {
+  const form = (template, title) =>
+    `${ISSUES}?${new URLSearchParams({ template, entry: entry.id, title: `${title}: ${entry.name}` })}`;
+  return el("details", { class: "more" },
+    el("summary", { title: "Suggest an edit or report a problem", "aria-label": `Suggest an edit or report ${entry.name}` }, icon("flag")),
+    el("div", { class: "menu" },
+      el("a", { href: form("edit.yml", "Edit") }, icon("pencil"), "Suggest an edit"),
+      el("a", { href: form("report.yml", "Report") }, icon("flag"), "Report a problem"),
+    ),
+  );
+}
+
 function row(entry) {
   const home = entry.repo || entry.forum;
   const links = el("div", { class: "links" },
@@ -157,6 +174,7 @@ function row(entry) {
       el("div", { class: "title" },
         el("h2", {}, el("a", { href: home, text: entry.name })),
         entry.version && chip("tag", entry.version.replace(/^v(?=\d)/i, ""), "Version", "", "span"),
+        feedback(entry),
       ),
       el("div", { class: "by", text: `by ${entry.author}` }),
       entry.description && el("p", { class: "desc", text: entry.description }),
@@ -224,7 +242,7 @@ function buildFacets() {
     const details = el("details", { class: "facet", "data-key": facet.key },
       el("summary", {}, facet.label, count), panel);
     details.addEventListener("toggle", () => {
-      if (details.open) for (const other of document.querySelectorAll(".facet[open]")) if (other !== details) other.open = false;
+      if (details.open) closeMenus(details);
     });
     return details;
   });
@@ -259,13 +277,20 @@ function clearAll() {
   return b;
 }
 
-// Close an open filter menu when clicking elsewhere or pressing Escape.
+// Close an open filter or flag menu when clicking elsewhere or pressing Escape. One open at a time.
+const MENUS = ".facet[open], .more[open]";
+function closeMenus(except) {
+  for (const d of document.querySelectorAll(MENUS)) if (d !== except) d.open = false;
+}
+document.addEventListener("toggle", (e) => {
+  if (e.target.matches?.(".more") && e.target.open) closeMenus(e.target);
+}, true);
 document.addEventListener("click", (e) => {
-  for (const d of document.querySelectorAll(".facet[open]")) if (!d.contains(e.target)) d.open = false;
+  for (const d of document.querySelectorAll(MENUS)) if (!d.contains(e.target)) d.open = false;
 });
 document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
-  const open = document.querySelector(".facet[open]");
+  const open = document.querySelector(MENUS);
   if (open) { open.open = false; open.querySelector("summary").focus(); }
 });
 

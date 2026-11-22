@@ -2,6 +2,7 @@ name: Check
 
 on:
   pull_request:
+  workflow_dispatch: # started by the Submission workflow for the pull requests it opens
 
 permissions:
   contents: read
@@ -15,7 +16,7 @@ jobs:
         run: python3 -m unittest discover -s tests
       - name: New entries say where they were tested
         run: |
-          git fetch --depth=1 origin "$GITHUB_BASE_REF"
+          git fetch --depth=1 origin "${GITHUB_BASE_REF:-main}"
           missing=0
           for f in $(git diff --name-only --diff-filter=A FETCH_HEAD HEAD -- entries/); do
             for key in krita os; do

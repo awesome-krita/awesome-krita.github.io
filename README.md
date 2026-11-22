@@ -16,6 +16,14 @@ You only need a link.
 
 You can also open a pull request yourself. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## Fix or report something
+
+Every entry on the site has a flag button next to its name.
+
+- **Suggest an edit** opens a form with the entry filled in. Fill in only what should change. A pull request is opened for you. If you own the plugin's repo, it's marked `author` and reviewed first.
+- **Report a problem** is for broken downloads, wrong details or things that don't belong here. Nothing is removed only because of a report.
+- **If something may harm people's computers or files**, use [private reporting](https://github.com/emarpiee/awesome-krita/security/advisories/new), not a public issue.
+
 ## What gets in
 
 - It says which Krita versions and systems (Windows, macOS, Linux, Android) it was tested on.
@@ -53,11 +61,13 @@ The site rebuilds after every merge and every Monday, so stars, versions and dow
 | `entries/` | One `.toml` file per entry |
 | `scripts/build.py` | Checks the entries, reads the details, writes `site/data.json` |
 | `scripts/add.py` | Makes a new entry file from a link |
+| `scripts/edit.py` | Changes an entry from an edit request |
+| `scripts/icons.py` | Copies the icons the site uses into `site/app.js` |
 | `site/` | The web page |
 | `tests/` | Tests for the checks |
 | `.github/workflows/check.yml` | Runs the tests and the build on every pull request |
 | `.github/workflows/site.yml` | Builds and publishes the site |
-| `.github/workflows/submission.yml` | Turns a submission issue into a pull request |
+| `.github/workflows/submission.yml` | Turns a submission or edit issue into a pull request, and starts its checks |
 
 ```
 python3 -m unittest discover -s tests                                     # checks, no internet needed
@@ -74,4 +84,5 @@ python3 -m http.server -d site                                            # prev
 - *Settings > Pages*: set the source to *GitHub Actions*.
 - *Settings > Actions > General*: allow GitHub Actions to create pull requests (for the submission form).
 - *Settings > Branches*: protect `main` and require the *Check* workflow to pass.
-- Pull requests opened by the submission form don't start the *Check* workflow by themselves. The form runs the same checks before it opens the pull request.
+- Pull requests opened by the forms don't start workflows by themselves, so the *Submission* workflow starts *Check* on them.
+- *Settings > Security*: turn on private vulnerability reporting, for reports about harmful entries.

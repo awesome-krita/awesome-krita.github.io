@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
 import add  # noqa: E402
 import build  # noqa: E402
+import edit  # noqa: E402
 
 GOOD = {"repo": "https://github.com/wojtryb/Shortcut-Composer", "type": "plugin", "category": ["workflow"]}
 
@@ -263,6 +264,38 @@ G'MIC Studio
         self.assertEqual((a["krita"], a["os"]), (["6"], ["Linux"]))
 
 
+class EditForm(unittest.TestCase):
+    ENTRY = GOOD | {"description": "Old text.", "krita": ["5.2"], "os": ["Linux"]}
+
+    def body(self, **answers):
+        return "\n".join(f"### {q}\n\n{a}\n" for q, a in answers.items())
+
+    def test_only_filled_fields_change(self):
+        answers = add.read_answers(self.body(**{"Entry": "shortcut-composer", "Display name": "_No response_",
+                                               "Description": "Pie menus\nand shortcuts.", "Tested on": "Linux, Windows"}))
+        self.assertEqual(edit.changes_from(answers), {"description": "Pie menus and shortcuts.", "os": ["Linux", "Windows"]})
+
+    def test_category_labels_and_preview(self):
+        answers = add.read_answers(self.body(**{"Category": "Dark (theme)", "Type": "Theme",
+                                               "Preview": "![x](https://github.com/user-attachments/assets/9)"}))
+        self.assertEqual(edit.changes_from(answers), {"type": "theme", "category": ["dark"],
+                                                      "image": "https://github.com/user-attachments/assets/9"})
+
+    def test_edited_entry_keeps_every_key(self):
+        edited = self.ENTRY | {"name": "Shortcut Composer", "download": "https://example.com/a.zip"}
+        self.assertEqual(build.tomllib.loads(add.to_toml(edited)), edited)
+
+    def test_type_change_needs_matching_category(self):
+        self.assertIn("not for a theme", build.validate(self.ENTRY | {"type": "theme"}, "shortcut-composer")[0])
+
+    def test_is_author(self):
+        self.assertTrue(edit.is_author(GOOD, "wojtryb"))
+        self.assertTrue(edit.is_author(GOOD, "WojTryb"))
+        self.assertFalse(edit.is_author(GOOD, "someone"))
+        self.assertFalse(edit.is_author({"forum": "https://krita-artists.org/t/x/1"}, "wojtryb"))
+        self.assertFalse(edit.is_author(GOOD, ""))
+
+
 class FormCategories(unittest.TestCase):
     def test_theme_and_brush_labels(self):
         body = IssueForm.BODY.replace("Plugin", "Theme").replace("\nWorkflow\n", "\nDark (theme), Light (theme)\n")
@@ -273,8 +306,8 @@ class InSync(unittest.TestCase):
     """The form and the site's colors must offer the same choices as build.py."""
     ROOT = Path(__file__).resolve().parent.parent
 
-    def form_options(self, field_id):
-        form = (self.ROOT / ".github/ISSUE_TEMPLATE/submit.yml").read_text()
+    def form_options(self, field_id, form="submit.yml"):
+        form = (self.ROOT / ".github/ISSUE_TEMPLATE" / form).read_text()
         block = re.search(rf"id: {field_id}\n(.*?)(?=\n  - type:|\Z)", form, re.S)[1]
         line = re.search(r"options: \[(.*)\]", block)[1]
         return [o.strip().strip('"') for o in line.split(",")]
@@ -288,6 +321,18 @@ class InSync(unittest.TestCase):
     def test_form_krita_and_os(self):
         self.assertEqual(self.form_options("krita"), build.KRITA)
         self.assertEqual(self.form_options("os"), build.SYSTEMS)
+
+    def test_edit_form_matches(self):
+        for field in ("type", "category", "krita", "os"):
+            with self.subTest(field):
+                self.assertEqual(self.form_options(field, "edit.yml"), self.form_options(field))
+
+    def test_site_buttons_fill_the_entry_field(self):
+        for form in ("edit.yml", "report.yml"):
+            with self.subTest(form):
+                self.assertIn("id: entry", (self.ROOT / ".github/ISSUE_TEMPLATE" / form).read_text())
+        self.assertIn('"edit.yml"', (self.ROOT / "site/app.js").read_text())
+        self.assertIn('"report.yml"', (self.ROOT / "site/app.js").read_text())
 
     def test_every_category_has_a_color(self):
         css = (self.ROOT / "site/style.css").read_text()

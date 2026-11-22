@@ -18,17 +18,31 @@ import build
 NO_ANSWER = "_No response_"
 
 
-def parse_issue(body):
-    """Read the answers from a GitHub issue form ("### Question" followed by the answer)."""
+def read_answers(body):
+    """{question: answer} from a GitHub issue form ("### Question" followed by the answer). Empty if unanswered."""
     answers = {}
     for m in re.finditer(r"^### (.+?)\s*\n(.*?)(?=^### |\Z)", body, re.S | re.M):
         value = m[2].strip()
         answers[m[1].strip()] = "" if value == NO_ANSWER else value
-    split = lambda s: [v.strip() for v in s.split(",") if v.strip()]  # multi-select answers are "a, b"
+    return answers
+
+
+def split(answer):
+    """Multi-select answers arrive as "a, b"."""
+    return [v.strip() for v in answer.split(",") if v.strip()]
+
+
+def categories(answer):
+    """Form labels like "Dark (theme)" back to keys like "dark"."""
+    return [build.FORM_CATEGORIES.get(c, c) for c in split(answer)]
+
+
+def parse_issue(body):
+    answers = read_answers(body)
     return {
         "links": [answers.get("GitHub repo", ""), answers.get("Krita Artists topic", "")],
         "type": answers.get("Type", "").lower(),
-        "category": [build.FORM_CATEGORIES.get(c, c) for c in split(answers.get("Category", ""))],
+        "category": categories(answers.get("Category", "")),
         "krita": split(answers.get("Tested in Krita", "")),
         "os": split(answers.get("Tested on", "")),
         "name": answers.get("Display name", ""),
@@ -70,8 +84,9 @@ def to_toml(entry):
     def value(v):  # JSON strings are valid TOML strings, quotes and all
         return "[" + ", ".join(json.dumps(x, ensure_ascii=False) for x in v) + "]" if isinstance(v, list) \
             else json.dumps(v, ensure_ascii=False)
-    order = ["repo", "forum", "name", "type", "category", "krita", "os", "image"]
-    return "".join(f"{k} = {value(entry[k])}\n" for k in order if k in entry)
+    order = ["repo", "forum", "name", "description", "author", "type", "category", "krita", "os", "download", "image"]
+    keys = [k for k in order if k in entry] + sorted(k for k in entry if k not in order)
+    return "".join(f"{k} = {value(entry[k])}\n" for k in keys)
 
 
 def main():

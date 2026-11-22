@@ -214,6 +214,26 @@ button.thumb { cursor: pointer; }
 }
 
 .title { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem; }
+
+/* Flag menu: quiet until hovered or open */
+.more { position: relative; margin-left: auto; }
+.more summary {
+  list-style: none; cursor: pointer; color: var(--muted);
+  display: inline-flex; padding: 0.375rem; border-radius: 4px; border: 1px solid transparent;
+}
+.more summary::-webkit-details-marker { display: none; }
+.more summary:hover, .more[open] summary { color: var(--ink); border-color: var(--line); }
+.more .menu {
+  position: absolute; right: 0; top: calc(100% + 0.25rem); z-index: 5;
+  display: grid; min-width: 12rem; padding: 0.375rem;
+  background: var(--surface); border: 1px solid var(--ink); border-radius: 4px;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.18);
+}
+.more .menu a {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.45rem 0.5rem; border-radius: 3px; text-decoration: none; font-size: 0.9375rem;
+}
+.more .menu a:hover { background: var(--bg); }
 .entry h2 { margin: 0; font-size: 1.25rem; font-weight: 700; line-height: 1.25; }
 .entry h2 a { text-decoration: none; }
 .entry h2 a:hover { text-decoration: underline; }

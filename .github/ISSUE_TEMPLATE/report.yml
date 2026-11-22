@@ -1,0 +1,40 @@
+name: Report a problem
+description: Something listed is broken, wrong or shouldn't be here.
+title: "Report: "
+labels: [report]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **If it may harm people's computers or files**, don't report it here, where everyone can read it.
+        Use [private reporting](https://github.com/emarpiee/awesome-krita/security/advisories/new) instead.
+
+        Nothing is removed only because of a report. Every report is checked by hand.
+  - type: input
+    id: entry
+    attributes:
+      label: Entry
+      description: Filled in by the report button on the site.
+      placeholder: shortcut-composer
+    validations:
+      required: true
+  - type: dropdown
+    id: reason
+    attributes:
+      label: What's wrong?
+      options:
+        - The download doesn't work
+        - It doesn't work in Krita
+        - The details are wrong
+        - It's no longer maintained
+        - It's not made for Krita
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: What happened, and on which Krita version and system.
+    validations:
+      required: true

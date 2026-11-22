@@ -1,0 +1,68 @@
+name: Suggest an edit
+description: Fix or update an entry that's already listed.
+title: "Edit: "
+labels: [edit]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fill in only what should change. Empty fields stay as they are.
+        A pull request is opened for you after you submit. If you made the plugin, it's marked so it can be reviewed first.
+  - type: input
+    id: entry
+    attributes:
+      label: Entry
+      description: Filled in by the edit button on the site.
+      placeholder: shortcut-composer
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: Display name
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: One sentence, 160 characters at most. Say what it does.
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options: [Plugin, Theme, Brushes, Tool, Resource]
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: Replaces all current categories. Plugins, tools and resources use the plain ones. Themes and brushes use the ones marked (theme) or (brushes).
+      multiple: true
+      options: [Color, Workflow, Layers, Reference, Animation, Export, Effects, Other, Dark (theme), Light (theme), Sketching (brushes), Painting (brushes), Inking (brushes), Texture (brushes), Pixel art (brushes)]
+  - type: dropdown
+    id: krita
+    attributes:
+      label: Tested in Krita
+      description: Replaces the current list. Only versions someone actually tried.
+      multiple: true
+      options: ["6", "5.3", "5.2", "5.1 or older"]
+  - type: dropdown
+    id: os
+    attributes:
+      label: Tested on
+      description: Replaces the current list. Only systems someone actually tried.
+      multiple: true
+      options: [Windows, macOS, Linux, Android]
+  - type: textarea
+    id: preview
+    attributes:
+      label: Preview
+      description: Drop a new screenshot, GIF or short video here.
+  - type: input
+    id: download
+    attributes:
+      label: Download link
+      description: Only if the download isn't the latest GitHub release or the link in the forum post.
+      placeholder: https://
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else?
