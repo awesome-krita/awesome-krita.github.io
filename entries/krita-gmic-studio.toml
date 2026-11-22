@@ -1,5 +1,6 @@
 repo = "https://github.com/emarpiee/krita-gmic-studio"
 name = "G'MIC Studio"
+description = "G'MIC filters in a docker, with live preview, favorites and presets. Doesn't block Krita while open. Works offline."
 type = "plugin"
 category = ["effects"]
 krita = ["6"]
