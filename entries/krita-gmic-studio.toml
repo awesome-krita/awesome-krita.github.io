@@ -5,3 +5,4 @@ type = "plugin"
 category = ["effects"]
 krita = ["6"]
 os = ["Linux"]
+image = "https://raw.githubusercontent.com/emarpiee/krita-gmic-studio/main/docs/screenshots/filters-tab-array_faded-live_preview.webp"
