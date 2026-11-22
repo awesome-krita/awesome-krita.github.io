@@ -1,0 +1,6 @@
+repo = "https://github.com/madjyc/Krita_Tile_Grid_Plugin"
+name = "Tile Grid"
+description = "Guides that split the canvas into tiles or cells, for tilesets, photoboards and storyboard layouts."
+type = "plugin"
+category = ["workflow"]
+krita = ["5.2"]

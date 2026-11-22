@@ -1,0 +1,7 @@
+repo = "https://github.com/MalloryMiller/KritaColorJitter"
+name = "Color Jitter"
+description = "Color jitter for any brush."
+type = "plugin"
+category = ["color"]
+krita = ["5.2"]
+os = ["Linux"]

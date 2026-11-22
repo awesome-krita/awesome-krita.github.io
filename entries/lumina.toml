@@ -1,4 +1,5 @@
 repo = "https://github.com/Vyeche/Lumina"
+description = "Shade a sphere from three colors to study key light, ambient and base color, then sample the result into your brush."
 type = "plugin"
 category = ["color"]
-description = "Shade a sphere from three colors to study key light, ambient and base color, then sample the result into your brush."
+os = ["Linux"]

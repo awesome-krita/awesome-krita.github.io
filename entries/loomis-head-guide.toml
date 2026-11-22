@@ -1,0 +1,6 @@
+repo = "https://github.com/Pine885/Krita-Plugin-Loomis-Method-Guide-Head-pine885"
+name = "Loomis Head Guide"
+description = "A docker that draws an adjustable Loomis head construction guide on a vector layer, with presets."
+type = "plugin"
+category = ["reference"]
+krita = ["5.3"]
