@@ -178,6 +178,59 @@ hi
         self.assertEqual(add.file_name("Layer Kit: organize your layers!"), "layer-kit-organize-your-layers")
 
 
+class RealSubmission(unittest.TestCase):
+    """A full form answer as GitHub sends it, for krita-gmic-studio, down to the entry file."""
+    BODY = """### GitHub repo
+
+https://github.com/emarpiee/krita-gmic-studio
+
+### Krita Artists topic
+
+_No response_
+
+### Type
+
+Plugin
+
+### Category
+
+Effects
+
+### Tested in Krita
+
+6
+
+### Tested on
+
+Linux
+
+### Anything else?
+
+_No response_
+
+### Before you send
+
+- [X] The download is free and needs no account.
+"""
+
+    def test_to_entry_file(self):
+        a = add.parse_issue(self.BODY)
+        entry = add.make_entry(a["links"], a["type"], a["category"], a["krita"], a["os"])
+        self.assertEqual(build.validate(entry, "krita-gmic-studio"), [])
+        self.assertEqual(add.to_toml(entry), (
+            'repo = "https://github.com/emarpiee/krita-gmic-studio"\n'
+            'type = "plugin"\n'
+            'category = ["effects"]\n'
+            'krita = ["6"]\n'
+            'os = ["Linux"]\n'
+        ))
+
+    def test_windows_line_endings(self):
+        a = add.parse_issue(self.BODY.replace("\n", "\r\n"))
+        self.assertEqual(a["links"][0], "https://github.com/emarpiee/krita-gmic-studio")
+        self.assertEqual((a["krita"], a["os"]), (["6"], ["Linux"]))
+
+
 class FormCategories(unittest.TestCase):
     def test_theme_and_brush_labels(self):
         body = IssueForm.BODY.replace("Plugin", "Theme").replace("\nWorkflow\n", "\nDark (theme), Light (theme)\n")
