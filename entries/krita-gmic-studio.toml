@@ -1,0 +1,6 @@
+repo = "https://github.com/emarpiee/krita-gmic-studio"
+name = "G'MIC Studio"
+type = "plugin"
+category = ["effects"]
+krita = ["6"]
+os = ["Linux"]
