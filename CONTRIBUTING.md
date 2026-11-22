@@ -1,6 +1,6 @@
 # Contributing
 
-The easiest way is the [submission form](https://github.com/emarpiee/awesome-krita/issues/new?template=submit.yml). It only asks for a link.
+The easiest way is the [submission form](../../issues/new?template=submit.yml). It only asks for a link.
 
 ## By pull request
 

@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         **If it may harm people's computers or files**, don't report it here, where everyone can read it.
-        Use [private reporting](https://github.com/emarpiee/awesome-krita/security/advisories/new) instead.
+        Use [private reporting](../../security/advisories/new) instead.
 
         Nothing is removed only because of a report. Every report is checked by hand.
   - type: input

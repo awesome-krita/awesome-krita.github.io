@@ -131,6 +131,8 @@ def find_duplicates(entries):
 def load_entries():
     entries, errors = {}, []
     for path in sorted(ENTRIES.glob("*")):
+        if path.name == "LICENSE":
+            continue
         if path.suffix != ".toml":
             errors.append((path.stem, f"{path.name} is not a .toml file"))
             continue

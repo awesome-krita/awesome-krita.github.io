@@ -147,7 +147,17 @@ function link(cls, href, iconName, label, title) {
 }
 
 // The flag button: opens a GitHub issue form with this entry filled in.
-const ISSUES = "https://github.com/emarpiee/awesome-krita/issues/new";
+// The GitHub repo, from the address the site is served from, so links follow a move or a fork:
+// owner.github.io/repo -> github.com/owner/repo, and owner.github.io -> github.com/owner/owner.github.io.
+const REPO = (() => {
+  const m = location.hostname.match(/^([\w-]+)\.github\.io$/i);
+  if (!m) return "https://github.com/emarpiee/awesome-krita"; // local preview
+  const first = location.pathname.split("/")[1];
+  const repo = first && !first.includes(".") ? first : location.hostname; // "/index.html" is not a repo
+  return `https://github.com/${m[1]}/${repo}`;
+})();
+const ISSUES = `${REPO}/issues/new`;
+for (const a of document.querySelectorAll("a[data-repo]")) a.href = REPO + a.dataset.repo;
 
 function feedback(entry) {
   const form = (template, title) =>

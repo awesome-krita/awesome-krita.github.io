@@ -10,7 +10,7 @@ A list of plugins, themes and tools for Krita. Every entry is checked by hand be
 
 You only need a link.
 
-1. Open a [new submission](https://github.com/emarpiee/awesome-krita/issues/new?template=submit.yml).
+1. Open a [new submission](../../issues/new?template=submit.yml).
 2. Paste the GitHub repo, the Krita Artists topic, or both. Pick a type, one or more categories, and the Krita versions and systems it was tested on. Optionally give a display name and drop in a screenshot, GIF or short video.
 3. A pull request is opened for you. If a link doesn't work, a comment on your issue says what to fix.
 
@@ -22,7 +22,7 @@ Every entry on the site has a flag button next to its name.
 
 - **Suggest an edit** opens a form with the entry filled in. Fill in only what should change. A pull request is opened for you. If you own the plugin's repo, it's marked `author` and reviewed first.
 - **Report a problem** is for broken downloads, wrong details or things that don't belong here. Nothing is removed only because of a report.
-- **If something may harm people's computers or files**, use [private reporting](https://github.com/emarpiee/awesome-krita/security/advisories/new), not a public issue.
+- **If something may harm people's computers or files**, use [private reporting](../../security/advisories/new), not a public issue.
 
 ## What gets in
 
@@ -54,7 +54,14 @@ The rest is read from GitHub and Krita Artists when the site is built:
 
 The site rebuilds after every merge and every Monday, so stars, versions and download links stay current. If a link stops working, the weekly build fails and the list keeps its last good version until it's fixed.
 
+## License
+
+The list itself (`entries/`) is [CC0](entries/LICENSE): anyone can reuse it, no credit needed. The scripts and the site are [MIT](LICENSE). Taking part means following the [code of conduct](CODE_OF_CONDUCT.md).
+
 ## For maintainers
+
+How to review entries, handle reports and fix a failed build: [MAINTAINING.md](MAINTAINING.md).
+
 
 | Path | What it does |
 |---|---|
