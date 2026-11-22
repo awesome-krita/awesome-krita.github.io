@@ -28,6 +28,12 @@ body:
     attributes:
       label: Preview
       description: Optional. Drop a screenshot, GIF or short video here. Leave empty to use the first picture in the README or forum post.
+  - type: input
+    id: download
+    attributes:
+      label: Download link
+      description: Optional. A direct link to the file people install. Leave empty to use the latest GitHub release, or the first download link in the forum post.
+      placeholder: https://
   - type: dropdown
     id: type
     attributes:

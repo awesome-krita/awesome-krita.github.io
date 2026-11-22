@@ -244,6 +244,14 @@ G'MIC Studio
         self.assertEqual(build.tomllib.loads(add.to_toml(entry)), entry)
         self.assertEqual(add.file_name(a["name"]), "gmic-studio")
 
+    def test_own_download_link(self):
+        body = self.BODY.replace("### Type", "### Download link\n\nhttps://example.com/gmic-studio.zip\n\n### Type")
+        a = add.parse_issue(body)
+        entry = add.make_entry(a["links"], a["type"], a["category"], a["krita"], a["os"], download=a["download"])
+        self.assertEqual(entry["download"], "https://example.com/gmic-studio.zip")
+        self.assertEqual(build.validate(entry, "gmic-studio"), [])
+        self.assertIn("https://", build.validate(entry | {"download": "ftp://x/a.zip"}, "x")[0])
+
     def test_preview_forms(self):
         for text, link in [
             ("![demo](https://github.com/user-attachments/assets/1)", "https://github.com/user-attachments/assets/1"),
@@ -326,6 +334,11 @@ class InSync(unittest.TestCase):
         for field in ("type", "category", "krita", "os"):
             with self.subTest(field):
                 self.assertEqual(self.form_options(field, "edit.yml"), self.form_options(field))
+
+    def test_forms_ask_for_a_download_link(self):
+        for form in ("submit.yml", "edit.yml"):
+            with self.subTest(form):
+                self.assertIn("label: Download link", (self.ROOT / ".github/ISSUE_TEMPLATE" / form).read_text())
 
     def test_site_buttons_fill_the_entry_field(self):
         for form in ("edit.yml", "report.yml"):

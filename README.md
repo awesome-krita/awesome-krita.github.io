@@ -49,7 +49,7 @@ The rest is read from GitHub and Krita Artists when the site is built:
 | Author | Repo owner | Topic author |
 | Description | Repo description | First paragraph of the post |
 | Picture | The preview from the form if given, else the first picture in the README | Same, else the first picture in the post |
-| Download | The zip in the latest release. Without a release, a zip of the main branch | First download link in the post |
+| Download | The link from the form if given, else the zip in the latest release, else a zip of the main branch | Same, else the first download link in the post |
 | Stars, license, version, last update | Yes | Last update only |
 
 The site rebuilds after every merge and every Monday, so stars, versions and download links stay current. If a link stops working, the weekly build fails and the list keeps its last good version until it's fixed.

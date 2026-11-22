@@ -47,6 +47,7 @@ def parse_issue(body):
         "os": split(answers.get("Tested on", "")),
         "name": answers.get("Display name", ""),
         "image": first_link(answers.get("Preview", "")),
+        "download": answers.get("Download link", "").strip(),
     }
 
 
@@ -56,8 +57,10 @@ def first_link(text):
     return m[0] if m else ""
 
 
-def make_entry(links, type_, category, krita=(), os=(), name="", image=""):
+def make_entry(links, type_, category, krita=(), os=(), name="", image="", download=""):
     entry = {"type": type_, "category": list(category)}
+    if download:
+        entry["download"] = download
     if name:
         entry["name"] = name
     if image:
@@ -104,7 +107,7 @@ def main():
         if not answers["krita"] or not answers["os"]:
             raise SystemExit("Pick at least one Krita version and one system it was tested on.")
         entry = make_entry(answers["links"], answers["type"], answers["category"], answers["krita"], answers["os"],
-                           answers["name"], answers["image"])
+                           answers["name"], answers["image"], answers["download"])
     else:
         entry = make_entry(args.links, args.type, args.category, args.krita, args.os)
 
