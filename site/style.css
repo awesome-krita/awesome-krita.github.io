@@ -213,6 +213,7 @@ button.thumb { cursor: pointer; }
   padding: 0.25rem 0.4rem; border-radius: 2px;
 }
 
+.title { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem; }
 .entry h2 { margin: 0; font-size: 1.25rem; font-weight: 700; line-height: 1.25; }
 .entry h2 a { text-decoration: none; }
 .entry h2 a:hover { text-decoration: underline; }

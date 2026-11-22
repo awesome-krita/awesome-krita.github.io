@@ -88,17 +88,18 @@ function thumb(entry) {
   return button;
 }
 
+// Icon plus value; `meaning` is the hover text and what screen readers say.
+// "minor" chips are left out of the grid view to keep cards short.
+function chip(iconName, value, meaning, cls = "", tag = "li") {
+  return el(tag, { class: `chip ${cls}`.trim(), title: meaning }, icon(iconName),
+    el("span", { class: "visually-hidden", text: `${meaning}: ` }), el("span", { text: value }));
+}
+
 function chips(entry) {
-  // Icon plus value; `meaning` is the hover text and what screen readers say.
-  // "minor" chips are left out of the grid view to keep cards short.
-  const chip = (iconName, value, meaning, cls = "") =>
-    el("li", { class: `chip ${cls}`.trim(), title: meaning }, icon(iconName),
-      el("span", { class: "visually-hidden", text: `${meaning}: ` }), el("span", { text: value }));
   const typeName = entry.type[0].toUpperCase() + entry.type.slice(1);
   return el("ul", { class: "chips", "aria-label": "Details" },
     ...entry.category.map((c) => el("li", { class: "chip cat", title: "Category" }, swatch(c), data.categories[c] || c)),
     chip(TYPE_ICONS[entry.type] || "package", typeName, "Type"),
-    entry.version && chip("tag", entry.version.replace(/^v(?=\d)/i, ""), "Version"),
     entry.license && chip("scale", entry.license, "License", "minor"),
     entry.stars != null && chip("star", String(entry.stars), "GitHub stars", "minor"),
     entry.krita && chip("krita", entry.krita.join(", "), "Tested in Krita", "minor"),
@@ -137,7 +138,10 @@ function row(entry) {
   return el("li", { class: "entry", id: entry.id },
     thumb(entry),
     el("div", { class: "body" },
-      el("h2", {}, el("a", { href: home, text: entry.name })),
+      el("div", { class: "title" },
+        el("h2", {}, el("a", { href: home, text: entry.name })),
+        entry.version && chip("tag", entry.version.replace(/^v(?=\d)/i, ""), "Version", "", "span"),
+      ),
       el("div", { class: "by", text: `by ${entry.author}` }),
       entry.description && el("p", { class: "desc", text: entry.description }),
       chips(entry),
