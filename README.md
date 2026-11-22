@@ -83,6 +83,6 @@ python3 -m http.server -d site                                            # prev
 
 - *Settings > Pages*: set the source to *GitHub Actions*.
 - *Settings > Actions > General*: allow GitHub Actions to create pull requests (for the submission form).
-- *Settings > Branches*: protect `main` and require the *Check* workflow to pass.
+- *Settings > Rules > Rulesets*: a ruleset on the default branch that restricts deletions, blocks force pushes and requires the `check` status check. Add *Repository admin* to the bypass list (*Always allow*), or direct pushes to `main` get rejected.
 - Pull requests opened by the forms don't start workflows by themselves, so the *Submission* workflow starts *Check* on them.
 - *Settings > Security*: turn on private vulnerability reporting, for reports about harmful entries.
