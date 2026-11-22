@@ -1,5 +1,5 @@
 repo = "https://github.com/10zindraws/Layer-Kit"
 forum = "https://krita-artists.org/t/layer-kit-organize-your-layers-faster/157281"
 type = "plugin"
-category = "layers"
+category = ["layers"]
 description = "Adds features to the Layers docker to find and organize layers faster."

@@ -29,7 +29,9 @@ body:
     id: category
     attributes:
       label: Category
-      options: [Color, Workflow, Layers, Reference, Animation, Export, Effects, Other]
+      description: Pick all that fit. Plugins, tools and resources use the plain ones. Themes and brushes use the ones marked (theme) or (brushes).
+      multiple: true
+      options: [Color, Workflow, Layers, Reference, Animation, Export, Effects, Other, Dark (theme), Light (theme), Sketching (brushes), Painting (brushes), Inking (brushes), Texture (brushes), Pixel art (brushes)]
     validations:
       required: true
   - type: dropdown

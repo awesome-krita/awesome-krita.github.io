@@ -28,14 +28,14 @@
       <span class="visually-hidden">Search</span>
       <input id="q" type="search" placeholder="Search by name, author or what it does" autocomplete="off">
     </label>
-    <fieldset>
-      <legend class="visually-hidden">Type</legend>
-      <div id="types" class="types"></div>
-    </fieldset>
-    <fieldset>
-      <legend class="visually-hidden">Category</legend>
-      <div id="categories" class="categories"></div>
-    </fieldset>
+    <div class="bar">
+      <div id="facets" class="facets"></div>
+      <div class="view" role="group" aria-label="Layout">
+        <button type="button" data-view="list" aria-pressed="true">List</button>
+        <button type="button" data-view="grid" aria-pressed="false">Grid</button>
+      </div>
+    </div>
+    <div id="active" class="active" hidden></div>
   </form>
 
   <p id="count" class="count" aria-live="polite"></p>

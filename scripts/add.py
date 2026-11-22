@@ -27,14 +27,14 @@ def parse_issue(body):
     return {
         "links": [answers.get("GitHub repo", ""), answers.get("Krita Artists topic", "")],
         "type": answers.get("Type", "").lower(),
-        "category": answers.get("Category", "").lower(),
+        "category": [build.FORM_CATEGORIES.get(c, c) for c in split(answers.get("Category", ""))],
         "krita": split(answers.get("Tested in Krita", "")),
         "os": split(answers.get("Tested on", "")),
     }
 
 
 def make_entry(links, type_, category, krita=(), os=()):
-    entry = {"type": type_, "category": category}
+    entry = {"type": type_, "category": list(category)}
     if krita:
         entry["krita"] = list(krita)
     if os:
@@ -64,7 +64,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("links", nargs="*")
     p.add_argument("--type", default="plugin")
-    p.add_argument("--category", default="other")
+    p.add_argument("--category", nargs="+", default=["other"], help="one or more, e.g. --category color workflow")
     p.add_argument("--krita", nargs="+", default=[], help=f"tested Krita versions: {', '.join(build.KRITA)}")
     p.add_argument("--os", nargs="+", default=[], help=f"tested systems: {', '.join(build.SYSTEMS)}")
     p.add_argument("--issue-body")

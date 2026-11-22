@@ -1,4 +1,4 @@
 repo = "https://github.com/kaichi1342/PaletteGenerator"
 type = "plugin"
-category = "color"
+category = ["color"]
 description = "Generates color palettes at random or from one of nine color schemes. Works best in sRGB documents."

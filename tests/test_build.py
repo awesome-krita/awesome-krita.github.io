@@ -2,6 +2,7 @@
 
 python3 -m unittest discover -s tests
 """
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -11,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 import add  # noqa: E402
 import build  # noqa: E402
 
-GOOD = {"repo": "https://github.com/wojtryb/Shortcut-Composer", "type": "plugin", "category": "workflow"}
+GOOD = {"repo": "https://github.com/wojtryb/Shortcut-Composer", "type": "plugin", "category": ["workflow"]}
 
 
 class Validate(unittest.TestCase):
@@ -22,15 +23,29 @@ class Validate(unittest.TestCase):
         self.assertEqual(self.check(GOOD), [])
 
     def test_forum_only(self):
-        entry = {"forum": "https://krita-artists.org/t/color-mixer-docker/173261/1", "type": "plugin", "category": "color"}
+        entry = {"forum": "https://krita-artists.org/t/color-mixer-docker/173261/1", "type": "plugin", "category": ["color"]}
         self.assertEqual(self.check(entry), [])
 
     def test_needs_a_link(self):
-        self.assertIn("needs a `repo` link", self.check({"type": "plugin", "category": "color"})[0])
+        self.assertIn("needs a `repo` link", self.check({"type": "plugin", "category": ["color"]})[0])
 
-    def test_wrong_type_and_category(self):
-        errors = self.check(GOOD | {"type": "plugins", "category": "colour"})
-        self.assertEqual(len(errors), 2)
+    def test_wrong_type(self):
+        self.assertIn("`type` must be", self.check(GOOD | {"type": "plugins"})[0])
+
+    def test_category(self):
+        self.assertIn("must be a list", self.check(GOOD | {"category": "color"})[0])
+        self.assertIn("must be a list", self.check(GOOD | {"category": ["colour"]})[0])
+        self.assertIn("must be a list", self.check(GOOD | {"category": []})[0])
+        self.assertEqual(self.check(GOOD | {"category": ["color", "workflow"]}), [])
+
+    def test_category_fits_type(self):
+        self.assertEqual(self.check(GOOD | {"type": "theme", "category": ["dark"]}), [])
+        self.assertIn("not for a theme", self.check(GOOD | {"type": "theme", "category": ["color"]})[0])
+        self.assertIn("not for a plugin", self.check(GOOD | {"category": ["inking"]})[0])
+
+    def test_missing_category(self):
+        entry = dict(GOOD); del entry["category"]
+        self.assertIn("missing `category`", self.check(entry)[0])
 
     def test_repo_must_be_a_repo(self):
         for bad in ["https://github.com/wojtryb", "https://gitlab.com/a/b", "http://github.com/a/b",
@@ -142,7 +157,7 @@ hi
     def test_parse(self):
         answers = add.parse_issue(self.BODY)
         self.assertEqual(answers["links"], ["https://github.com/wojtryb/Shortcut-Composer", ""])
-        self.assertEqual((answers["type"], answers["category"]), ("plugin", "workflow"))
+        self.assertEqual((answers["type"], answers["category"]), ("plugin", ["workflow"]))
         self.assertEqual((answers["krita"], answers["os"]), (["5.3", "6"], ["Windows", "Linux"]))
 
     def test_make_entry(self):
@@ -161,6 +176,41 @@ hi
 
     def test_file_name(self):
         self.assertEqual(add.file_name("Layer Kit: organize your layers!"), "layer-kit-organize-your-layers")
+
+
+class FormCategories(unittest.TestCase):
+    def test_theme_and_brush_labels(self):
+        body = IssueForm.BODY.replace("Plugin", "Theme").replace("\nWorkflow\n", "\nDark (theme), Light (theme)\n")
+        self.assertEqual(add.parse_issue(body)["category"], ["dark", "light"])
+
+
+class InSync(unittest.TestCase):
+    """The form and the site's colors must offer the same choices as build.py."""
+    ROOT = Path(__file__).resolve().parent.parent
+
+    def form_options(self, field_id):
+        form = (self.ROOT / ".github/ISSUE_TEMPLATE/submit.yml").read_text()
+        block = re.search(rf"id: {field_id}\n(.*?)(?=\n  - type:|\Z)", form, re.S)[1]
+        line = re.search(r"options: \[(.*)\]", block)[1]
+        return [o.strip().strip('"') for o in line.split(",")]
+
+    def test_form_types(self):
+        self.assertEqual([o.lower() for o in self.form_options("type")], list(build.TYPES))
+
+    def test_form_categories(self):
+        self.assertEqual(self.form_options("category"), list(build.FORM_CATEGORIES))
+
+    def test_form_krita_and_os(self):
+        self.assertEqual(self.form_options("krita"), build.KRITA)
+        self.assertEqual(self.form_options("os"), build.SYSTEMS)
+
+    def test_every_category_has_a_color(self):
+        css = (self.ROOT / "site/style.css").read_text()
+        light, dark = css.split("prefers-color-scheme: dark", 1)
+        for key in build.ALL_CATEGORIES:
+            with self.subTest(key):
+                self.assertIn(f"--{key}:", light)
+                self.assertIn(f"--{key}:", dark)
 
 
 class RealEntries(unittest.TestCase):

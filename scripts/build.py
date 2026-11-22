@@ -23,7 +23,7 @@ ENTRIES = ROOT / "entries"
 OUT = ROOT / "site" / "data.json"
 
 TYPES = {"plugin": "Plugins", "theme": "Themes", "brushes": "Brushes", "tool": "Tools", "resource": "Resources"}
-CATEGORIES = {
+WHAT_IT_DOES = {
     "color": "Color",
     "workflow": "Workflow",
     "layers": "Layers",
@@ -33,10 +33,25 @@ CATEGORIES = {
     "effects": "Effects",
     "other": "Other",
 }
+# Each type has its own categories. A new category also needs a color in site/style.css
+# and an option in .github/ISSUE_TEMPLATE/submit.yml (the tests check both).
+CATEGORIES = {
+    "plugin": WHAT_IT_DOES,
+    "tool": WHAT_IT_DOES,
+    "resource": WHAT_IT_DOES,
+    "theme": {"dark": "Dark", "light": "Light"},
+    "brushes": {"sketching": "Sketching", "painting": "Painting", "inking": "Inking", "texture": "Texture", "pixel-art": "Pixel art"},
+}
+ALL_CATEGORIES = {k: v for cats in CATEGORIES.values() for k, v in cats.items()}
+# How categories read in the submission form: "Color", "Dark (theme)", "Inking (brushes)".
+FORM_CATEGORIES = {}
+for _type, _cats in CATEGORIES.items():
+    for _key, _label in _cats.items():
+        FORM_CATEGORIES.setdefault(_label if _cats is WHAT_IT_DOES else f"{_label} ({_type})", _key)
 KRITA = ["6", "5.3", "5.2", "5.1 or older"]
 SYSTEMS = ["Windows", "macOS", "Linux", "Android"]
-LISTS = {"krita": KRITA, "os": SYSTEMS}  # keys that hold a list of choices
-KEYS = {"repo", "forum", "type", "category", "name", "description", "author", "download", "image", *LISTS}
+LISTS = {"category": ALL_CATEGORIES, "krita": KRITA, "os": SYSTEMS}  # keys that hold a list of choices
+KEYS = {"repo", "forum", "type", "name", "description", "author", "download", "image", *LISTS}
 MAX_DESCRIPTION = 160
 
 REPO_RE = re.compile(r"^https://github\.com/([\w.-]+)/([\w.-]+?)(?:\.git)?/?$")
@@ -69,8 +84,14 @@ def validate(entry, stem):
 
     if entry.get("type") not in TYPES:
         errors.append(f"`type` must be one of: {', '.join(TYPES)}")
-    if entry.get("category") not in CATEGORIES:
-        errors.append(f"`category` must be one of: {', '.join(CATEGORIES)}")
+    elif "category" not in entry:
+        errors.append("missing `category`")
+    else:
+        allowed = CATEGORIES[entry["type"]]
+        wrong = [c for c in entry["category"] if c not in allowed]
+        if wrong:
+            choices = ", ".join(f'"{c}"' for c in allowed)
+            errors.append(f"category {', '.join(wrong)} is not for a {entry['type']}. Pick from: {choices}")
     if "repo" not in entry and "forum" not in entry:
         errors.append("needs a `repo` link, a `forum` link, or both")
     if "repo" in entry and not REPO_RE.match(entry["repo"]):
@@ -255,7 +276,7 @@ def fetch(entry):
     info.update(entry)
     for key, order in LISTS.items():
         if key in info:
-            info[key] = sorted(set(info[key]), key=order.index)
+            info[key] = sorted(set(info[key]), key=list(order).index)
     return {k: v for k, v in info.items() if v not in (None, "")}
 
 
@@ -286,7 +307,8 @@ def main():
     data = {
         "generated": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
         "types": TYPES,
-        "categories": CATEGORIES,
+        "categories": ALL_CATEGORIES,
+        "krita": KRITA,
         "systems": SYSTEMS,
         "entries": out,
     }

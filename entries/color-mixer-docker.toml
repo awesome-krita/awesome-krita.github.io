@@ -1,5 +1,5 @@
 forum = "https://krita-artists.org/t/color-mixer-docker/173261/1"
 type = "plugin"
-category = "color"
+category = ["color"]
 name = "Color Mixer Docker"
 description = "Mix six colors plus black and white into your current color."

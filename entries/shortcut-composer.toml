@@ -1,4 +1,4 @@
 repo = "https://github.com/wojtryb/Shortcut-Composer"
 type = "plugin"
-category = "workflow"
+category = ["workflow"]
 description = "Pie menus, mouse trackers and other complex keyboard shortcuts."
