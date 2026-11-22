@@ -10,6 +10,13 @@ const FACETS = [
   { key: "os", label: "Tested on", options: (d) => labels(d.systems) },
 ];
 
+// Icons: download and github from Lucide (ISC license), krita from Simple Icons (CC0).
+const ICONS = {
+  download: { stroke: true, d: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>' },
+  github: { stroke: true, d: '<path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/>' },
+  krita: { stroke: false, d: '<path d="M.652.76a.625.625 0 00-.5.246c-.352.448-.035.898.362 1.262.206.189 1.77 1.794 3.428 3.527a11.054 11.054 0 011.815-1.983C3.667 2.515 1.694 1.266 1.461 1.1 1.201.914.917.762.652.76zm5.105 3.052c1.848 1.148 3.786 2.332 4.693 2.84 1.469.821 3.758 2.684 4.092 4.434.535.466 2.182 1.916 2.596 2.413.698-.211 1.518.133 2.06 1.12.866 1.583.227 3.747-1.968 4.988a5.42 5.42 0 01-.296.267l.296-.267c1.14-1.468-.714-2.44-1.175-3.864a2.06 2.06 0 01-.11-.78c-.533-.282-2.11-1.452-2.795-1.965-1.801.16-4.207-1.773-5.35-3.08-.7-.802-2.32-2.517-3.858-4.123a11.052 11.052 0 00-2.046 6.393A11.052 11.052 0 1012.948 1.136c-2.64.004-5.19.954-7.19 2.676zm8.71 7.552c-.515.126-.968.831-1.118 1.306-.038.115-.04.303.066.342.802.592 1.556 1.168 2.4 1.7.162-.393.746-.963 1.096-1.2zm-11.53 1.639c.812 1.898 5.798 7.17 12.06 2.695a2.07 2.07 0 00.114.715c.46 1.42 2.36 2.427 1.238 3.89-2.135 1.364-5 1.201-6.989.528-3.558-1.204-5.914-4.332-6.424-7.828zm13.782.7a.771.771 0 00-.065.049c-.004.003-.008.008-.011.008.003-.003.007-.008.01-.008.024-.015.044-.034.066-.048z"/>' },
+};
+
 const $ = (id) => document.getElementById(id);
 const state = { q: "", view: "list", filters: Object.fromEntries(FACETS.map((f) => [f.key, new Set()])) };
 let data;
@@ -86,12 +93,31 @@ function chips(entry) {
   );
 }
 
+function icon(name) {
+  const { stroke, d } = ICONS[name];
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("class", "icon");
+  if (stroke) {
+    for (const [k, v] of Object.entries({ fill: "none", stroke: "currentColor", "stroke-width": 2, "stroke-linecap": "round", "stroke-linejoin": "round" })) svg.setAttribute(k, v);
+  } else {
+    svg.setAttribute("fill", "currentColor");
+  }
+  svg.innerHTML = d; // fixed icon markup from ICONS, never data from entries
+  return svg;
+}
+
+function link(cls, href, iconName, label, title) {
+  return el("a", { class: cls, href, title: title || label }, icon(iconName), el("span", { class: "label", text: label }));
+}
+
 function row(entry) {
   const home = entry.repo || entry.forum;
   const links = el("div", { class: "links" },
-    el("a", { class: "download", href: entry.download, text: "Download" }),
-    entry.repo && el("a", { href: entry.repo, text: "GitHub" }),
-    entry.forum && el("a", { href: entry.forum, text: "Krita Artists" }),
+    link("download", entry.download, "download", "Download"),
+    entry.repo && link("gh", entry.repo, "github", "GitHub"),
+    entry.forum && link("forum", entry.forum, "krita", "Forum", "Krita Artists forum"),
   );
   return el("li", { class: "entry", id: entry.id },
     thumb(entry),
