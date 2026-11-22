@@ -14,20 +14,24 @@ jobs:
       - uses: actions/checkout@v4
       - name: Tests
         run: python3 -m unittest discover -s tests
-      - name: New entries say where they were tested
+      - name: New entries say which Krita versions they were tested in
         run: |
           git fetch --depth=1 origin "${GITHUB_BASE_REF:-main}"
           missing=0
           for f in $(git diff --name-only --diff-filter=A FETCH_HEAD HEAD -- entries/); do
-            for key in krita os; do
-              if ! grep -q "^$key *=" "$f"; then
-                echo "$f: needs \`$key\` (see CONTRIBUTING.md)"
-                missing=1
-              fi
-            done
+            # The Krita versions it was tested in are required. The system only when it's known.
+            if ! grep -q "^krita *=" "$f"; then
+              echo "$f: needs \`krita\`, the Krita versions it was tested in (see CONTRIBUTING.md)"
+              missing=1
+            fi
           done
           exit $missing
       - name: Check entries and their links
         run: python3 scripts/build.py
         env:
           GITHUB_TOKEN: ${{ github.token }}
+      - name: Look inside new and changed downloads
+        # A report on the run's summary page for the reviewer. It never fails the check.
+        run: |
+          ids=$(git diff --name-only --diff-filter=AM FETCH_HEAD HEAD -- 'entries/*.toml' | xargs -rn1 basename | sed 's/\.toml$//')
+          if [ -n "$ids" ]; then python3 scripts/scan.py $ids; else echo "No new or changed entries."; fi

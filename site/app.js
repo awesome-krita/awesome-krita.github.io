@@ -30,7 +30,7 @@ const ICONS = {
 };
 
 const $ = (id) => document.getElementById(id);
-const state = { q: "", view: "list", filters: Object.fromEntries(FACETS.map((f) => [f.key, new Set()])) };
+const state = { q: "", view: "list", sort: "name", filters: Object.fromEntries(FACETS.map((f) => [f.key, new Set()])) };
 let data;
 
 function labels(values = [], format = (v) => v) {
@@ -53,6 +53,22 @@ const swatch = (cat) => el("span", { class: "swatch", style: `--sw: var(--${cat}
 const valuesOf = (entry, key) => [].concat(entry[key] ?? []);
 
 const TYPE_ICONS = { plugin: "plug", theme: "palette", brushes: "brush", tool: "wrench", resource: "package" };
+
+const STALE_YEARS = 2; // entries not updated for this long get a note
+
+// "Not updated since 2022" when the entry's last update is older than STALE_YEARS before the last build.
+function staleSince(entry) {
+  if (!entry.updated || entry.archived) return null;
+  const limit = new Date(data.generated + "T00:00:00");
+  limit.setFullYear(limit.getFullYear() - STALE_YEARS);
+  return new Date(entry.updated + "T00:00:00") < limit ? entry.updated.slice(0, 4) : null;
+}
+
+const SORTS = {
+  name: (a, b) => a.name.localeCompare(b.name),
+  updated: (a, b) => (b.updated || "").localeCompare(a.updated || ""),
+  stars: (a, b) => (b.stars ?? -1) - (a.stars ?? -1), // entries without stars (forum only) go last
+};
 
 function formatDate(iso) {
   return new Date(iso + "T00:00:00").toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
@@ -124,6 +140,8 @@ function chips(entry) {
     entry.os && chip("monitor", entry.os.join(", "), "Tested on", "minor"),
     entry.updated && chip("calendar", formatDate(entry.updated), "Last updated", "minor"),
     entry.archived && el("li", { class: "chip warn", text: "Archived" }),
+    staleSince(entry) && el("li", { class: "chip stale", title: `No changes for over ${STALE_YEARS} years. It may still work.`,
+      text: `Not updated since ${staleSince(entry)}` }),
   );
 }
 
@@ -184,6 +202,7 @@ function row(entry) {
       el("div", { class: "title" },
         el("h2", {}, el("a", { href: home, text: entry.name })),
         entry.version && chip("tag", entry.version.replace(/^v(?=\d)/i, ""), "Version", "", "span"),
+        entry.krita?.includes("6") && el("span", { class: "chip k6", title: "Tested in Krita 6" }, icon("krita"), "Krita 6"),
         feedback(entry),
       ),
       el("div", { class: "by", text: `by ${entry.author}` }),
@@ -220,7 +239,7 @@ function pairCategoriesWithTypes() {
 
 function render() {
   pairCategoriesWithTypes();
-  const shown = data.entries.filter(matches);
+  const shown = data.entries.filter(matches).sort(SORTS[state.sort] || SORTS.name);
   $("list").replaceChildren(...shown.map(row));
   $("count").textContent = shown.length === 1 ? "1 entry" : `${shown.length} entries`;
   $("empty").hidden = shown.length > 0;
@@ -325,6 +344,7 @@ fetch("data.json")
     buildFacets();
     $("generated").textContent = `Last refresh: ${formatDate(data.generated)}.`;
     $("q").addEventListener("input", (e) => { state.q = e.target.value.trim().toLowerCase(); render(); });
+    $("sort").addEventListener("change", (e) => { state.sort = e.target.value; render(); });
     render();
   })
   .catch(() => { $("count").textContent = "The list could not be loaded. Try reloading the page."; });

@@ -15,7 +15,7 @@ krita = ["5.3", "6"]
 os = ["Windows", "Linux"]
 ```
 
-You need `type`, `category`, `krita`, `os`, and at least one of `repo` or `forum`. Everything else is read from those links.
+You need `type`, `category`, `krita`, and at least one of `repo` or `forum`. Add `os` when you know it. Everything else is read from those links.
 
 **Keys**
 
@@ -31,7 +31,7 @@ You need `type`, `category`, `krita`, `os`, and at least one of `repo` or `forum
 | `download` | No | Use when the download isn't on GitHub or in the forum post |
 | `image` | No | A picture, GIF or video link, when the README's first picture isn't a good preview. Videos and GIFs stay still until clicked |
 | `krita` | Yes, for new entries | Krita versions it was tested in. Any of `"6"`, `"5.3"`, `"5.2"`, `"5.1 or older"` |
-| `os` | Yes, for new entries | Systems it was tested on. Any of `"Windows"`, `"macOS"`, `"Linux"`, `"Android"` |
+| `os` | When known | Systems it was tested on. Any of `"Windows"`, `"macOS"`, `"Linux"`, `"Android"`. Leave it out if nobody knows |
 
 `category`, `krita` and `os` are lists, like `krita = ["5.3", "6"]`. Everything else is text in quotes.
 

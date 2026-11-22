@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 import add  # noqa: E402
 import build  # noqa: E402
 import edit  # noqa: E402
+import scan  # noqa: E402
 
 GOOD = {"repo": "https://github.com/wojtryb/Shortcut-Composer", "type": "plugin", "category": ["workflow"]}
 
@@ -354,6 +355,56 @@ class InSync(unittest.TestCase):
             with self.subTest(key):
                 self.assertIn(f"--{key}:", light)
                 self.assertIn(f"--{key}:", dark)
+
+
+def make_zip(files):
+    import io, zipfile
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        for name, text in files.items():
+            z.writestr(name, text)
+    return buf.getvalue()
+
+
+class Scan(unittest.TestCase):
+    DESKTOP = {"tool.desktop": "[Desktop Entry]\nServiceTypes=Krita/PythonPlugin\n"}
+
+    def found(self, files, kind="plugin"):
+        return {what for what, _ in scan.inspect(make_zip(self.DESKTOP | files), kind)}
+
+    def test_clean_plugin(self):
+        self.assertEqual(self.found({"tool/__init__.py": "from krita import *\ndialog.exec()\nwin.exec_()\n"}), set())
+
+    def test_flags_what_to_read(self):
+        found = self.found({"tool/a.py": "import subprocess\nx = eval(text)\nimport urllib.request\n",
+                            "tool/b.py": "data = base64.b64decode(s)\n", "tool/helper.dll": "MZ"})
+        self.assertEqual(found, {"Runs other programs", "Runs code made from text", "Uses the internet",
+                                 "Unpacks hidden data", "Contains a program or library"})
+
+    def test_comments_are_ignored(self):
+        self.assertEqual(self.found({"tool/a.py": "# we never eval(anything) or use subprocess\n"}), set())
+
+    def test_text_is_ignored(self):
+        source = 'def run(d):\n    """Run with exec(), or subprocess if needed."""\n    msg = "eval(x)"\n    return f"{msg} exec("\n'
+        self.assertEqual(self.found({"tool/a.py": source}), set())
+
+    def test_code_after_text_still_counts(self):
+        self.assertIn("Runs code made from text", self.found({"tool/a.py": 'x = "1+1"; y = eval(x)\n'}))
+
+    def test_broken_file_still_scanned(self):
+        self.assertIn("Runs other programs", self.found({"tool/a.py": "def (:\nimport subprocess\n"}))
+
+    def test_packed_code(self):
+        self.assertIn("Very long line, maybe packed code", self.found({"tool/a.py": "x = '" + "a" * 1200 + "'\n"}))
+
+    def test_missing_plugin_description(self):
+        data = make_zip({"tool/__init__.py": "pass\n"})
+        self.assertIn("No Krita plugin description (.desktop) found", {w for w, _ in scan.inspect(data, "plugin")})
+        self.assertEqual(scan.inspect(data, "theme"), [])
+
+    def test_summary_keeps_first_places(self):
+        s = scan.summarize([("Uses the internet", f"a.py:{n}") for n in range(1, 6)])
+        self.assertEqual(s["Uses the internet"], (["a.py:1", "a.py:2", "a.py:3"], 2))
 
 
 class RealEntries(unittest.TestCase):

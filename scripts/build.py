@@ -232,8 +232,12 @@ def from_github(owner, name):
     try:
         release = get_json(f"https://api.github.com/repos/{owner}/{name}/releases/latest")
         zips = [a for a in release["assets"] if a["name"].lower().endswith(".zip")]
-        # One zip: link it directly. Several (one per system) or none: link the release page.
-        info["download"] = zips[0]["browser_download_url"] if len(zips) == 1 else release["html_url"]
+        if len(zips) == 1:
+            info["download"] = zips[0]["browser_download_url"]
+        elif not release["assets"]:  # no files attached: the release's source zip is the download
+            info["download"] = f"{url}/archive/refs/tags/{urllib.parse.quote(release['tag_name'], safe='')}.zip"
+        else:  # several zips (one per system) or other files: let people pick on the release page
+            info["download"] = release["html_url"]
         info["version"] = release["tag_name"]
     except urllib.error.HTTPError as e:
         if e.code != 404:

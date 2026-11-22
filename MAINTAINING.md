@@ -18,7 +18,9 @@ The checks only prove that the file is valid and the links work. A person checks
 
 - [ ] Open the repo or forum post. It's made for Krita and does what the description says.
 - [ ] The download is the real thing: from the author's own repo or post, not a mirror or a file host nobody can trace.
-- [ ] Look at what the plugin runs. Be careful with anything that downloads code, runs programs, or asks for an account or a key.
+- [ ] Read the **What's inside the downloads** report: open the `check` run on the pull request, then its *Summary*. It lists places in the code worth reading, like running programs, using the internet or `eval`. These are often fine (G'MIC Studio runs `gmic` on purpose), but each should make sense for what the plugin does.
+- [ ] Open the report's VirusTotal link. If VirusTotal doesn't know the file, you can upload it there yourself.
+- [ ] Be careful with anything that downloads code, runs programs nobody mentioned, or asks for an account or a key.
 - [ ] If you can, install it in Krita. Say in your review which version and system you tried.
 - [ ] The description says what it does, in one plain sentence. No "best", no "A Krita plugin that".
 - [ ] The categories fit and the tested versions and systems look honest.

@@ -26,10 +26,18 @@
   <form class="filters" role="search" onsubmit="return false">
     <label class="search">
       <span class="visually-hidden">Search</span>
-      <input id="q" type="search" placeholder="Search by name, author or what it does" autocomplete="off">
+      <input id="q" type="search" placeholder="Search by name or what it does" autocomplete="off">
     </label>
     <div class="bar">
       <div id="facets" class="facets"></div>
+      <label class="sort">
+        <span class="visually-hidden">Sort by</span>
+        <select id="sort">
+          <option value="name">Name</option>
+          <option value="updated">Recently updated</option>
+          <option value="stars">Most stars</option>
+        </select>
+      </label>
       <div class="view" role="group" aria-label="Layout">
         <button type="button" data-view="list" aria-pressed="true">List</button>
         <button type="button" data-view="grid" aria-pressed="false">Grid</button>

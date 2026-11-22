@@ -251,6 +251,15 @@ button.thumb { cursor: pointer; }
   color: var(--muted);
 }
 .chip.cat { color: var(--ink); }
+.chip.k6 { color: var(--ink); border-color: var(--ink); font-weight: 500; }
+.chip.stale { color: var(--reference); border-color: currentColor; }
+
+.sort select {
+  font: inherit; font-size: 0.9375rem; color: inherit;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 4px;
+  padding: 0.3rem 0.5rem; min-height: 2.25rem; cursor: pointer;
+}
+.sort select:hover { border-color: var(--ink); }
 .chip .icon { width: 0.875rem; height: 0.875rem; }
 .chip.warn { color: var(--color); border-color: currentColor; font-weight: 500; }
 

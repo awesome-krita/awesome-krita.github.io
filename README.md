@@ -24,9 +24,19 @@ Every entry on the site has a flag button next to its name.
 - **Report a problem** is for broken downloads, wrong details or things that don't belong here. Nothing is removed only because of a report.
 - **If something may harm people's computers or files**, use [private reporting](../../security/advisories/new), not a public issue.
 
+## How entries are checked
+
+Nobody can promise that a plugin is safe, but every entry goes through this before it's listed:
+
+- **Automatic:** the links must work, and the download is opened and read. Programs inside it, code that runs other programs, uses the internet or unpacks hidden data are listed for the reviewer, with a [VirusTotal](https://www.virustotal.com) link to the exact file.
+- **By hand:** a maintainer reads that report and the plugin's code, and checks that the download comes from the author.
+- **After:** anyone can [report a problem](../../issues/new?template=report.yml). If something may be harmful, use [private reporting](../../security/advisories/new).
+
+Krita plugins are Python files you can read. If you're unsure about one, open the zip and look, or ask on its repo or forum topic.
+
 ## What gets in
 
-- It says which Krita versions and systems (Windows, macOS, Linux, Android) it was tested on.
+- It says which Krita versions it was tested in, and which systems (Windows, macOS, Linux, Android) when that's known.
 - The download is free and needs no account.
 - It has a GitHub repo or a Krita Artists topic. Repos without releases are fine.
 - It's not already listed.
