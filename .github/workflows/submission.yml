@@ -1,0 +1,62 @@
+name: Submission
+
+# Turns a filled-in submission form into a pull request.
+# Needs: Settings > Actions > General > "Allow GitHub Actions to create and approve pull requests".
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  pull-request:
+    if: contains(github.event.issue.labels.*.name, 'submission') && github.event.issue.state == 'open'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+      NUMBER: ${{ github.event.issue.number }}
+      BODY: ${{ github.event.issue.body }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write the entry
+        id: add
+        run: |
+          printf '%s' "$BODY" > "$RUNNER_TEMP/body.md"
+          if ! python3 scripts/add.py --issue-body "$RUNNER_TEMP/body.md" > "$RUNNER_TEMP/out.txt" 2>&1; then
+            {
+              echo "This could not be added yet:"
+              echo
+              echo '```'
+              cat "$RUNNER_TEMP/out.txt"
+              echo '```'
+              echo
+              echo "Edit this issue to fix it. The check runs again after each edit."
+            } > "$RUNNER_TEMP/comment.md"
+            gh issue comment "$NUMBER" --body-file "$RUNNER_TEMP/comment.md"
+            exit 1
+          fi
+          cut -f1 "$RUNNER_TEMP/out.txt" | tail -1 > "$RUNNER_TEMP/path.txt"
+          cut -f2 "$RUNNER_TEMP/out.txt" | tail -1 > "$RUNNER_TEMP/name.txt"
+
+      - name: Check the whole list
+        run: python3 -m unittest discover -s tests && python3 scripts/build.py
+
+      - name: Open or update the pull request
+        run: |
+          name=$(cat "$RUNNER_TEMP/name.txt")
+          branch="submission-$NUMBER"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$branch"
+          git add "$(cat "$RUNNER_TEMP/path.txt")"
+          git commit -m "Add $name"
+          git push --force origin "$branch"
+          if ! gh pr view "$branch" > /dev/null 2>&1; then
+            gh pr create --head "$branch" --title "Add $name" --body "From #$NUMBER. Closes #$NUMBER."
+          fi
+          gh issue comment "$NUMBER" --body "Thanks. The entry is in a pull request now and will be reviewed by hand."

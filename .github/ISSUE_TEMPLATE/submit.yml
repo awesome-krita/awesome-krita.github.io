@@ -1,0 +1,48 @@
+name: Add a plugin, theme or tool
+description: Paste a link. The details are filled in for you.
+title: "Add: "
+labels: [submission]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Give a GitHub repo, a Krita Artists topic, or both. The name, author, description, picture and download link are read from there.
+        A pull request is opened for you after you submit. If something is wrong, a comment tells you what to fix.
+  - type: input
+    id: repo
+    attributes:
+      label: GitHub repo
+      placeholder: https://github.com/owner/name
+  - type: input
+    id: forum
+    attributes:
+      label: Krita Artists topic
+      placeholder: https://krita-artists.org/t/name/12345
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options: [Plugin, Theme, Brushes, Tool, Resource]
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options: [Color, Workflow, Layers, Reference, Animation, Export, Effects, Other]
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else?
+      description: Optional. For example which Krita versions it works on.
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Before you send
+      options:
+        - label: It works in a current version of Krita.
+          required: true
+        - label: The download is free and needs no account.
+          required: true

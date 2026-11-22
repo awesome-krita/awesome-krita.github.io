@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>awesome-krita</title>
+<meta name="description" content="Plugins, themes and tools for Krita, checked by hand.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <h1>awesome-krita</h1>
+    <p class="lede">Plugins, themes and tools for Krita, checked by hand.</p>
+    <p class="actions">
+      <a href="https://github.com/emarpiee/awesome-krita/issues/new?template=submit.yml">Add yours</a>
+      <a href="https://github.com/emarpiee/awesome-krita">Source on GitHub</a>
+    </p>
+  </div>
+</header>
+
+<main class="wrap">
+  <form class="filters" role="search" onsubmit="return false">
+    <label class="search">
+      <span class="visually-hidden">Search</span>
+      <input id="q" type="search" placeholder="Search by name, author or what it does" autocomplete="off">
+    </label>
+    <fieldset>
+      <legend class="visually-hidden">Type</legend>
+      <div id="types" class="types"></div>
+    </fieldset>
+    <fieldset>
+      <legend class="visually-hidden">Category</legend>
+      <div id="categories" class="categories"></div>
+    </fieldset>
+  </form>
+
+  <p id="count" class="count" aria-live="polite"></p>
+  <ol id="list" class="list"></ol>
+  <p id="empty" class="empty" hidden>Nothing matches. Try fewer words, or <a href="https://github.com/emarpiee/awesome-krita/issues/new?template=submit.yml">add it yourself</a>.</p>
+</main>
+
+<footer class="wrap foot">
+  <p>Details like stars, license and downloads come from GitHub and Krita Artists, and are refreshed every week. <span id="generated"></span></p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

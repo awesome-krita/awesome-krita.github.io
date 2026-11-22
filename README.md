@@ -1,0 +1,77 @@
+# awesome-krita
+
+A list of plugins, themes and tools for Krita. Every entry is checked by hand before it goes in.
+
+**Browse the list: https://emarpiee.github.io/awesome-krita/**
+
+> **Note:** This is a small, hand-kept list. It is not a full index of everything made for Krita.
+
+## Add something
+
+You only need a link.
+
+1. Open a [new submission](https://github.com/emarpiee/awesome-krita/issues/new?template=submit.yml).
+2. Paste the GitHub repo, the Krita Artists topic, or both. Pick a type and a category.
+3. A pull request is opened for you. If a link doesn't work, a comment on your issue says what to fix.
+
+You can also open a pull request yourself. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## What gets in
+
+- It works in a current version of Krita.
+- The download is free and needs no account.
+- It has a GitHub repo or a Krita Artists topic. Repos without releases are fine.
+- It's not already listed.
+
+## How it works
+
+Each entry is one small file in `entries/`, with a link and a category:
+
+```toml
+repo = "https://github.com/wojtryb/Shortcut-Composer"
+type = "plugin"
+category = "workflow"
+```
+
+The rest is read from GitHub and Krita Artists when the site is built:
+
+| Detail | From GitHub | From Krita Artists |
+|---|---|---|
+| Name | Repo name | Topic title |
+| Author | Repo owner | Topic author |
+| Description | Repo description | First paragraph of the post |
+| Picture | First picture in the README | First picture in the post |
+| Download | The zip in the latest release. Without a release, a zip of the main branch | First download link in the post |
+| Stars, license, version, last update | Yes | Last update only |
+
+The site rebuilds after every merge and every Monday, so stars, versions and download links stay current. If a link stops working, the weekly build fails and the list keeps its last good version until it's fixed.
+
+## For maintainers
+
+| Path | What it does |
+|---|---|
+| `entries/` | One `.toml` file per entry |
+| `scripts/build.py` | Checks the entries, reads the details, writes `site/data.json` |
+| `scripts/add.py` | Makes a new entry file from a link |
+| `site/` | The web page |
+| `tests/` | Tests for the checks |
+| `.github/workflows/check.yml` | Runs the tests and the build on every pull request |
+| `.github/workflows/site.yml` | Builds and publishes the site |
+| `.github/workflows/submission.yml` | Turns a submission issue into a pull request |
+
+```
+python3 -m unittest discover -s tests                                     # checks, no internet needed
+python3 scripts/add.py https://github.com/owner/name --category color     # add an entry from a link
+GITHUB_TOKEN=$(gh auth token) python3 scripts/build.py                    # build site/data.json
+python3 -m http.server -d site                                            # preview at http://localhost:8000
+```
+
+- Python 3.11 or newer. Nothing to install.
+- Without `GITHUB_TOKEN`, GitHub allows about 60 requests an hour. That runs out at around 20 entries.
+
+**One-time GitHub setup**
+
+- *Settings > Pages*: set the source to *GitHub Actions*.
+- *Settings > Actions > General*: allow GitHub Actions to create pull requests (for the submission form).
+- *Settings > Branches*: protect `main` and require the *Check* workflow to pass.
+- Pull requests opened by the submission form don't start the *Check* workflow by themselves. The form runs the same checks before it opens the pull request.

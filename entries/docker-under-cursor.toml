@@ -1,0 +1,4 @@
+repo = "https://github.com/Aqaao/DockerUnderCursor"
+type = "plugin"
+category = "workflow"
+description = "Opens a docker under your cursor, so you can use it without leaving the canvas."
