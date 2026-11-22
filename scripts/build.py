@@ -170,6 +170,15 @@ def link_works(url):
         return False
 
 
+def media_kind(url):
+    """"video" or "image", from what the server says it sends. None if the link doesn't work."""
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "awesome-krita"}), timeout=30) as r:
+            return "video" if r.headers.get_content_type().startswith("video/") else "image"
+    except (urllib.error.URLError, ValueError):
+        return None
+
+
 def pretty_name(repo_name):
     """Shortcut-Composer -> Shortcut Composer, PaletteGenerator -> Palette Generator."""
     name = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", repo_name)
@@ -297,6 +306,14 @@ def main():
             continue
         if not link_works(info["download"]):
             failed.append(f"entries/{stem}.toml: download link does not work: {info['download']}")
+        if info.get("image"):
+            kind = media_kind(info["image"])
+            if kind is None and "image" in entry:
+                failed.append(f"entries/{stem}.toml: image link does not work: {info['image']}")
+            elif kind is None:
+                del info["image"]  # a broken picture in someone's README shouldn't block the build
+            elif kind == "video":
+                info["video"] = True
         out.append({"id": stem, **info})
 
     if failed:

@@ -18,6 +18,16 @@ body:
     attributes:
       label: Krita Artists topic
       placeholder: https://krita-artists.org/t/name/12345
+  - type: input
+    id: name
+    attributes:
+      label: Display name
+      description: Optional. How the name should read on the site, like "G'MIC Studio". Leave empty to use the repo or topic name.
+  - type: textarea
+    id: preview
+    attributes:
+      label: Preview
+      description: Optional. Drop a screenshot, GIF or short video here. Leave empty to use the first picture in the README or forum post.
   - type: dropdown
     id: type
     attributes:

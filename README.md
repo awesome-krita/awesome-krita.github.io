@@ -11,7 +11,7 @@ A list of plugins, themes and tools for Krita. Every entry is checked by hand be
 You only need a link.
 
 1. Open a [new submission](https://github.com/emarpiee/awesome-krita/issues/new?template=submit.yml).
-2. Paste the GitHub repo, the Krita Artists topic, or both. Pick a type, one or more categories, and the Krita versions and systems it was tested on.
+2. Paste the GitHub repo, the Krita Artists topic, or both. Pick a type, one or more categories, and the Krita versions and systems it was tested on. Optionally give a display name and drop in a screenshot, GIF or short video.
 3. A pull request is opened for you. If a link doesn't work, a comment on your issue says what to fix.
 
 You can also open a pull request yourself. See [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -40,7 +40,7 @@ The rest is read from GitHub and Krita Artists when the site is built:
 | Name | Repo name | Topic title |
 | Author | Repo owner | Topic author |
 | Description | Repo description | First paragraph of the post |
-| Picture | First picture in the README | First picture in the post |
+| Picture | The preview from the form if given, else the first picture in the README | Same, else the first picture in the post |
 | Download | The zip in the latest release. Without a release, a zip of the main branch | First download link in the post |
 | Stars, license, version, last update | Yes | Last update only |
 

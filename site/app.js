@@ -58,10 +58,11 @@ function formatDate(iso) {
 
 // --- one entry ---------------------------------------------------------------
 
-// GIFs show their first frame until clicked, so nothing moves on its own.
+// GIFs and videos show their first frame until clicked, so nothing moves on its own.
 function thumb(entry) {
   const style = `--sw: var(--${entry.category[0]})`;
   if (!entry.image) return el("div", { class: "thumb", style, "aria-hidden": "true" });
+  if (entry.video) return videoThumb(entry, style);
 
   const img = el("img", { src: entry.image, alt: "", loading: "lazy", referrerpolicy: "no-referrer" });
   img.addEventListener("error", () => img.remove());
@@ -84,6 +85,21 @@ function thumb(entry) {
     button.replaceChildren(playing ? still : img, label);
     label.textContent = playing ? "Play" : "Stop";
     button.setAttribute("aria-label", `${playing ? "Play" : "Stop"} preview of ${entry.name}`);
+  });
+  return button;
+}
+
+function videoThumb(entry, style) {
+  // #t=0.1 makes browsers show a real first frame instead of a blank box
+  const video = el("video", { src: `${entry.image}#t=0.1`, preload: "metadata", playsinline: "", loop: "", "aria-hidden": "true" });
+  video.muted = true;
+  const label = el("span", { class: "play", text: "Play" });
+  const button = el("button", { class: "thumb", style, type: "button", "aria-label": `Play preview of ${entry.name}` }, video, label);
+  button.addEventListener("click", () => {
+    const start = video.paused;
+    if (start) video.play().catch(() => {}); else video.pause();
+    label.textContent = start ? "Stop" : "Play";
+    button.setAttribute("aria-label", `${start ? "Stop" : "Play"} preview of ${entry.name}`);
   });
   return button;
 }

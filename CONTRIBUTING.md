@@ -29,7 +29,7 @@ You need `type`, `category`, `krita`, `os`, and at least one of `repo` or `forum
 | `description` | No | One sentence, 160 characters at most. Use when the repo description is missing or unclear |
 | `author` | No | Use when the repo owner isn't the person who made it |
 | `download` | No | Use when the download isn't on GitHub or in the forum post |
-| `image` | No | A picture link, when the README's first picture isn't a good preview |
+| `image` | No | A picture, GIF or video link, when the README's first picture isn't a good preview. Videos and GIFs stay still until clicked |
 | `krita` | Yes, for new entries | Krita versions it was tested in. Any of `"6"`, `"5.3"`, `"5.2"`, `"5.1 or older"` |
 | `os` | Yes, for new entries | Systems it was tested on. Any of `"Windows"`, `"macOS"`, `"Linux"`, `"Android"` |
 

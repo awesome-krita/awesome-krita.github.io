@@ -8,6 +8,7 @@ LINK is a GitHub repo, a Krita Artists topic, or one of each.
 Prints the new file's path and the entry's name, separated by a tab.
 """
 import argparse
+import json
 import re
 import sys
 from pathlib import Path
@@ -30,11 +31,23 @@ def parse_issue(body):
         "category": [build.FORM_CATEGORIES.get(c, c) for c in split(answers.get("Category", ""))],
         "krita": split(answers.get("Tested in Krita", "")),
         "os": split(answers.get("Tested on", "")),
+        "name": answers.get("Display name", ""),
+        "image": first_link(answers.get("Preview", "")),
     }
 
 
-def make_entry(links, type_, category, krita=(), os=()):
+def first_link(text):
+    """The first https link in a form answer. Dropped files arrive as ![name](link) or a bare link."""
+    m = re.search(r"https://[^\s)\"'<>\]]+", text)
+    return m[0] if m else ""
+
+
+def make_entry(links, type_, category, krita=(), os=(), name="", image=""):
     entry = {"type": type_, "category": list(category)}
+    if name:
+        entry["name"] = name
+    if image:
+        entry["image"] = image
     if krita:
         entry["krita"] = list(krita)
     if os:
@@ -50,13 +63,14 @@ def make_entry(links, type_, category, krita=(), os=()):
 
 
 def file_name(name):
-    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+    return re.sub(r"[^a-z0-9]+", "-", re.sub(r"['’]", "", name.lower())).strip("-")
 
 
 def to_toml(entry):
-    def value(v):
-        return "[" + ", ".join(f'"{x}"' for x in v) + "]" if isinstance(v, list) else f'"{v}"'
-    order = ["repo", "forum", "type", "category", "krita", "os"]
+    def value(v):  # JSON strings are valid TOML strings, quotes and all
+        return "[" + ", ".join(json.dumps(x, ensure_ascii=False) for x in v) + "]" if isinstance(v, list) \
+            else json.dumps(v, ensure_ascii=False)
+    order = ["repo", "forum", "name", "type", "category", "krita", "os", "image"]
     return "".join(f"{k} = {value(entry[k])}\n" for k in order if k in entry)
 
 
@@ -74,7 +88,8 @@ def main():
         answers = parse_issue(Path(args.issue_body).read_text(encoding="utf-8"))
         if not answers["krita"] or not answers["os"]:
             raise SystemExit("Pick at least one Krita version and one system it was tested on.")
-        entry = make_entry(answers["links"], answers["type"], answers["category"], answers["krita"], answers["os"])
+        entry = make_entry(answers["links"], answers["type"], answers["category"], answers["krita"], answers["os"],
+                           answers["name"], answers["image"])
     else:
         entry = make_entry(args.links, args.type, args.category, args.krita, args.os)
 

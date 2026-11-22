@@ -225,6 +225,38 @@ _No response_
             'os = ["Linux"]\n'
         ))
 
+    def test_display_name_and_preview(self):
+        body = self.BODY.replace("### Type", """### Display name
+
+G'MIC Studio
+
+### Preview
+
+<img width="800" alt="shot" src="https://github.com/user-attachments/assets/abc-123" />
+
+### Type""")
+        a = add.parse_issue(body)
+        self.assertEqual(a["name"], "G'MIC Studio")
+        self.assertEqual(a["image"], "https://github.com/user-attachments/assets/abc-123")
+        entry = add.make_entry(a["links"], a["type"], a["category"], a["krita"], a["os"], a["name"], a["image"])
+        self.assertEqual(build.validate(entry, "gmic-studio"), [])
+        self.assertEqual(build.tomllib.loads(add.to_toml(entry)), entry)
+        self.assertEqual(add.file_name(a["name"]), "gmic-studio")
+
+    def test_preview_forms(self):
+        for text, link in [
+            ("![demo](https://github.com/user-attachments/assets/1)", "https://github.com/user-attachments/assets/1"),
+            ("https://github.com/user-attachments/assets/video-2", "https://github.com/user-attachments/assets/video-2"),
+            ("", ""),
+            ("no link here", ""),
+        ]:
+            with self.subTest(text):
+                self.assertEqual(add.first_link(text), link)
+
+    def test_names_with_quotes_stay_valid_toml(self):
+        entry = GOOD | {"name": 'The "Best" \\ Tool'}
+        self.assertEqual(build.tomllib.loads(add.to_toml(entry)), entry)
+
     def test_windows_line_endings(self):
         a = add.parse_issue(self.BODY.replace("\n", "\r\n"))
         self.assertEqual(a["links"][0], "https://github.com/emarpiee/krita-gmic-studio")
