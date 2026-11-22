@@ -308,6 +308,7 @@ def main():
         "generated": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
         "types": TYPES,
         "categories": ALL_CATEGORIES,
+        "category_types": {t: list(cats) for t, cats in CATEGORIES.items()},
         "krita": KRITA,
         "systems": SYSTEMS,
         "entries": out,

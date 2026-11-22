@@ -1,9 +1,10 @@
 // Draws the list from data.json. Text from GitHub and the forum is only ever set with textContent.
 
 // The filters. To add one, add a line here. `key` is the field in data.json (text or a list),
-// `options` returns { value: label } from data.json. A filter only shows when it would narrow the list.
+// `options` returns { value: label } from data.json. A filter only shows when it would narrow the list,
+// unless it has `always: true` (then options with no entries show greyed out).
 const FACETS = [
-  { key: "type", label: "Type", options: (d) => d.types },
+  { key: "type", label: "Type", options: (d) => d.types, always: true },
   { key: "category", label: "Category", options: (d) => d.categories, swatch: true },
   { key: "krita", label: "Krita version", options: (d) => labels(d.krita, (v) => `Krita ${v}`) },
   { key: "os", label: "Tested on", options: (d) => labels(d.systems) },
@@ -116,7 +117,20 @@ function matches(entry) {
   return state.q.split(/\s+/).every((w) => hay.includes(w));
 }
 
+// With types picked, the Category menu only offers their categories.
+function pairCategoriesWithTypes() {
+  const types = [...state.filters.type];
+  const allowed = types.length ? new Set(types.flatMap((t) => data.category_types[t] || [])) : null;
+  for (const c of controls) {
+    if (c.key !== "category") continue;
+    const fits = !allowed || allowed.has(c.value);
+    c.row.hidden = !fits;
+    if (!fits) state.filters.category.delete(c.value);
+  }
+}
+
 function render() {
+  pairCategoriesWithTypes();
   const shown = data.entries.filter(matches);
   $("list").replaceChildren(...shown.map(row));
   $("count").textContent = shown.length === 1 ? "1 entry" : `${shown.length} entries`;
@@ -131,18 +145,20 @@ function buildFacets() {
   const facets = FACETS.map((facet) => {
     const options = Object.entries(facet.options(data) || {})
       .map(([value, label]) => [value, label, data.entries.filter((e) => valuesOf(e, facet.key).includes(value)).length])
-      .filter(([, , count]) => count > 0);
-    if (!options.some(([, , count]) => count < total)) return null; // would not narrow anything
+      .filter(([, , count]) => facet.always || count > 0);
+    if (!facet.always && !options.some(([, , count]) => count < total)) return null; // would not narrow anything
 
     const count = el("span", { class: "n" });
     const panel = el("div", { class: "panel" }, ...options.map(([value, label, n]) => {
-      const input = el("input", { type: "checkbox", value });
+      const input = el("input", { type: "checkbox", value, disabled: n === 0 });
       input.addEventListener("change", () => {
         state.filters[facet.key][input.checked ? "add" : "delete"](value);
         render();
       });
-      controls.push({ key: facet.key, value, input, label, swatch: facet.swatch });
-      return el("label", {}, input, facet.swatch && swatch(value), el("span", { text: label }), el("span", { class: "n", text: n }));
+      const row = el("label", { class: n === 0 ? "none" : null },
+        input, facet.swatch && swatch(value), el("span", { text: label }), el("span", { class: "n", text: n }));
+      controls.push({ key: facet.key, value, input, label, row, swatch: facet.swatch });
+      return row;
     }));
     const details = el("details", { class: "facet", "data-key": facet.key },
       el("summary", {}, facet.label, count), panel);
