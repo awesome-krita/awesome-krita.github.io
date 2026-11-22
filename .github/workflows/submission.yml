@@ -54,9 +54,9 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -B "$branch"
           git add "$(cat "$RUNNER_TEMP/path.txt")"
-          git commit -m "Add $name"
+          git commit -m "add: $name"
           git push --force origin "$branch"
           if ! gh pr view "$branch" > /dev/null 2>&1; then
-            gh pr create --head "$branch" --title "Add $name" --body "From #$NUMBER. Closes #$NUMBER."
+            gh pr create --head "$branch" --title "add: $name" --body "From #$NUMBER. Closes #$NUMBER."
           fi
           gh issue comment "$NUMBER" --body "Thanks. The entry is in a pull request now and will be reviewed by hand."
