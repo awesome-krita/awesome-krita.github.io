@@ -1,0 +1,5 @@
+repo = "https://github.com/Sumireneko/path_simplify"
+description = "Simplifies vector paths."
+type = "plugin"
+category = ["other"]
+krita = ["6", "5.3", "5.2"]

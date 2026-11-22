@@ -1,0 +1,6 @@
+repo = "https://github.com/veryprofessionaldodo/Krita-Photobash-Images-Plugin"
+name = "Photobash Images"
+description = "Browse your reference images in a docker and drop them onto the canvas for photobashing."
+type = "plugin"
+category = ["reference"]
+krita = ["5.1 or older"]
