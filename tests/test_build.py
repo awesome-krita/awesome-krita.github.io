@@ -121,6 +121,18 @@ class Helpers(unittest.TestCase):
     def test_first_image_none(self):
         self.assertIsNone(build.first_image("no pictures", "x"))
 
+    def test_fork_hint(self):
+        own = "https://github.com/Pine885/Krita-Plugin-Loomis-Method-Guide-Head-pine885"
+        readme = ("# Loomis\nBased on the original [Loomis Head Generator by lm0ss](https://github.com/lm0ss/loomis-head-krita). "
+                  "Forked by Nedeljko Umjetnik, then forked by pine885(me).\n")
+        self.assertEqual(build.fork_hint(readme, own), "https://github.com/lm0ss/loomis-head-krita")
+
+    def test_fork_hint_ignores_own_links_and_plain_mentions(self):
+        own = "https://github.com/a/tool"
+        self.assertIsNone(build.fork_hint("Fork https://github.com/a/tool and open a pull request.\n", own))
+        self.assertIsNone(build.fork_hint("Thanks to https://github.com/b/lib for the color math.\n", own))
+        self.assertIsNone(build.fork_hint("No links here, feel free to fork.\n", own))
+
     def test_short_text(self):
         self.assertEqual(build.short_text("<p>Hello &amp; <b>bye</b></p><p>more</p>"), "Hello & bye")
         self.assertTrue(build.short_text("<p>" + "word " * 100 + "</p>").endswith("..."))

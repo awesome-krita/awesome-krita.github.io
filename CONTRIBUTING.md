@@ -15,6 +15,8 @@ krita = ["5.3", "6"]
 os = ["Windows", "Linux"]
 ```
 
+Forks aren't listed for now: add the original project. That includes copies whose README says they were forked.
+
 You need `type`, `category`, `krita`, and at least one of `repo` or `forum`. Add `os` when you know it. Everything else is read from those links.
 
 **Keys**

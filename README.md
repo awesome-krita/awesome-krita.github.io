@@ -39,6 +39,7 @@ Krita plugins are Python files you can read. If you're unsure about one, open th
 - It says which Krita versions it was tested in, and which systems (Windows, macOS, Linux, Android) when that's known.
 - The download is free and needs no account.
 - It has a GitHub repo or a Krita Artists topic. Repos without releases are fine.
+- It's the original project, not a fork.
 - It's not already listed.
 
 ## How it works
