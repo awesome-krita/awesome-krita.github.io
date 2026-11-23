@@ -226,6 +226,22 @@ def short_text(html, limit=MAX_DESCRIPTION):
     return text[:limit].rsplit(" ", 1)[0].rstrip(",.;:") + "..."
 
 
+def release_download(repo_url, release):
+    """The download link for a repo's latest release. Live links where GitHub has them, so a new
+    release is downloadable at once, before the site rebuilds."""
+    zips = [a for a in release["assets"] if a["name"].lower().endswith(".zip")]
+    if len(zips) == 1:
+        name = zips[0]["name"]
+        # A name with a version in it (tool-1.2.0.zip) changes with each release, so a live link to it
+        # would break on the next one. Link that exact file instead; the daily build moves it on.
+        if re.search(r"\d+\.\d+", name):
+            return zips[0]["browser_download_url"]
+        return f"{repo_url}/releases/latest/download/{urllib.parse.quote(name)}"
+    if not release["assets"]:  # no files attached: the release's source zip (no live link exists for it)
+        return f"{repo_url}/archive/refs/tags/{urllib.parse.quote(release['tag_name'], safe='')}.zip"
+    return f"{repo_url}/releases/latest"  # several zips or other files: people pick on the newest release's page
+
+
 def from_github(owner, name):
     repo = get_json(f"https://api.github.com/repos/{owner}/{name}")
     url = repo["html_url"]
@@ -246,13 +262,7 @@ def from_github(owner, name):
     # Repos without releases get a zip of the main branch.
     try:
         release = get_json(f"https://api.github.com/repos/{owner}/{name}/releases/latest")
-        zips = [a for a in release["assets"] if a["name"].lower().endswith(".zip")]
-        if len(zips) == 1:
-            info["download"] = zips[0]["browser_download_url"]
-        elif not release["assets"]:  # no files attached: the release's source zip is the download
-            info["download"] = f"{url}/archive/refs/tags/{urllib.parse.quote(release['tag_name'], safe='')}.zip"
-        else:  # several zips (one per system) or other files: let people pick on the release page
-            info["download"] = release["html_url"]
+        info["download"] = release_download(url, release)
         info["version"] = release["tag_name"]
     except urllib.error.HTTPError as e:
         if e.code != 404:
@@ -330,7 +340,9 @@ def main():
         if fork_of := info.pop("fork_of", None):
             print(f"note: entries/{stem}.toml is a fork of {fork_of}", file=sys.stderr)
         if not link_works(info["download"]):
-            failed.append(f"entries/{stem}.toml: download link does not work: {info['download']}")
+            typed = " It's typed into the entry: remove the `download` line to use the automatic link, or put in one that works." \
+                if "download" in entry else ""
+            failed.append(f"entries/{stem}.toml: download link does not work: {info['download']}.{typed}")
         if info.get("image"):
             kind = media_kind(info["image"])
             if kind is None and "image" in entry:

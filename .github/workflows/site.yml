@@ -1,12 +1,12 @@
 name: Site
 
-# Runs on every merge, and every Monday so stars, versions and downloads stay current.
+# Runs on every merge, and every day so stars, versions and downloads stay current.
 # If a link has died, this run fails and GitHub emails you.
 on:
   push:
     branches: [main]
   schedule:
-    - cron: "0 6 * * 1"
+    - cron: "0 6 * * *"
   workflow_dispatch:
 
 permissions:

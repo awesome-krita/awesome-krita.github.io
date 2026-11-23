@@ -62,7 +62,19 @@ The rest is read from GitHub and Krita Artists when the site is built:
 | Download | The link from the form if given, else the zip in the latest release, else a zip of the main branch | Same, else the first download link in the post |
 | Stars, license, version, last update | Yes | Last update only |
 
-The site rebuilds after every merge and every Monday, so stars, versions and download links stay current. If a link stops working, the weekly build fails and the list keeps its last good version until it's fixed.
+The site rebuilds after every merge and every day, so stars, versions and download links stay current. If a link stops working, the build fails and the list keeps its last good version until it's fixed.
+
+How download links stay current:
+
+| Source | Link | New version |
+|---|---|---|
+| GitHub release with one zip, same name every release | The latest release's zip, by its name | Downloadable the moment it's released |
+| GitHub release with one zip, version in its name | That release's zip | After the next build |
+| GitHub release with several zips or other files | The latest release's page | Shown the moment it's released |
+| GitHub release with no files | That release's source zip | After the next build |
+| No releases | A zip of the main branch | Always the current code |
+| Krita Artists post | The first download link in the post | After the next build |
+| A link typed into the form | That link | Only through an edit request |
 
 ## License
 

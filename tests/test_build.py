@@ -121,6 +121,22 @@ class Helpers(unittest.TestCase):
     def test_first_image_none(self):
         self.assertIsNone(build.first_image("no pictures", "x"))
 
+    def test_release_download(self):
+        repo = "https://github.com/a/tool"
+        asset = lambda n: {"name": n, "browser_download_url": f"https://github.com/a/tool/releases/download/v1.2/{n}"}
+        versioned = {"tag_name": "v1.2", "assets": [asset("tool-1.2.0.zip")]}
+        self.assertEqual(build.release_download(repo, versioned), "https://github.com/a/tool/releases/download/v1.2/tool-1.2.0.zip")
+        one = {"tag_name": "v1.2", "assets": [asset("tool-plugin.zip"), asset("notes.txt")]}
+        self.assertEqual(build.release_download(repo, one), "https://github.com/a/tool/releases/latest/download/tool-plugin.zip")
+        spaced = {"tag_name": "v1", "assets": [asset("my tool.zip")]}
+        self.assertEqual(build.release_download(repo, spaced), "https://github.com/a/tool/releases/latest/download/my%20tool.zip")
+        none = {"tag_name": "release/1.0", "assets": []}
+        self.assertEqual(build.release_download(repo, none), "https://github.com/a/tool/archive/refs/tags/release%2F1.0.zip")
+        several = {"tag_name": "v2", "assets": [asset("win.zip"), asset("linux.zip")]}
+        self.assertEqual(build.release_download(repo, several), "https://github.com/a/tool/releases/latest")
+        other = {"tag_name": "v2", "assets": [asset("tool.kpp")]}
+        self.assertEqual(build.release_download(repo, other), "https://github.com/a/tool/releases/latest")
+
     def test_fork_hint(self):
         own = "https://github.com/Pine885/Krita-Plugin-Loomis-Method-Guide-Head-pine885"
         readme = ("# Loomis\nBased on the original [Loomis Head Generator by lm0ss](https://github.com/lm0ss/loomis-head-krita). "

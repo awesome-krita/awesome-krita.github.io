@@ -38,7 +38,7 @@ Nothing is removed only because of a report.
 
 | Report | What to do |
 |---|---|
-| The download doesn't work | The weekly build also catches this. Fix the link, or ask the author. |
+| The download doesn't work | The daily build also catches this. Fix the link, or ask the author. |
 | It doesn't work in Krita | Try it. If it's confirmed, update the tested versions or ask the author. |
 | The details are wrong | Fix them through an edit, like any other change |
 | It's no longer maintained | If the repo is archived, the site already shows it. Remove only when it no longer works. |
@@ -47,12 +47,12 @@ Nothing is removed only because of a report.
 
 To remove an entry, delete its file in `entries/` in a pull request and say why.
 
-## When the weekly build fails
+## When the daily build fails
 
-The site build runs every Monday and fails when a link has died. The site keeps its last good version until it's fixed.
+The site build runs every day and fails when a link has died. The site keeps its last good version until it's fixed.
 
 1. Open the failed run in the *Actions* tab. The log names the entry and the link.
-2. Fix the link in the entry file, or remove the entry if the project is gone.
+2. If the entry has a `download` line, it was typed in by hand: remove it to use the automatic link, or replace it. Otherwise ask the author, or remove the entry if the project is gone.
 
 ## Labels
 
