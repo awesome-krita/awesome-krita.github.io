@@ -51,7 +51,9 @@ for _type, _cats in CATEGORIES.items():
 KRITA = ["6", "5.3", "5.2", "5.1 or older"]
 SYSTEMS = ["Windows", "macOS", "Linux", "Android"]
 LISTS = {"category": ALL_CATEGORIES, "krita": KRITA, "os": SYSTEMS}  # keys that hold a list of choices
-KEYS = {"repo", "forum", "type", "name", "description", "author", "download", "image", *LISTS}
+KEYS = {"repo", "forum", "type", "name", "description", "author", "download", "image", "min_krita", *LISTS}
+MIN_KRITA_RE = re.compile(r"^\d+\.\d+(\.\d+)?$")  # 5.2 or 5.2.2
+REMOVED = ROOT / "removed.toml"
 MAX_DESCRIPTION = 160
 
 REPO_RE = re.compile(r"^https://github\.com/([\w.-]+)/([\w.-]+?)(?:\.git)?/?$")
@@ -101,6 +103,8 @@ def validate(entry, stem):
     for key in ("download", "image"):
         if key in entry and not entry[key].startswith("https://"):
             errors.append(f"`{key}` must start with https://")
+    if "min_krita" in entry and not MIN_KRITA_RE.match(entry["min_krita"]):
+        errors.append('`min_krita` must be a version like "5.2" or "5.2.2"')
     if len(entry.get("description", "")) > MAX_DESCRIPTION:
         errors.append(f"`description` is longer than {MAX_DESCRIPTION} characters")
     return errors
@@ -144,7 +148,28 @@ def load_entries():
         errors += [(path.stem, msg) for msg in validate(entry, path.stem)]
         entries[path.stem] = entry
     errors += find_duplicates(entries)
+    errors += find_removed(entries, load_removed())
     return entries, errors
+
+
+def load_removed():
+    """Entries taken off the list on purpose, from removed.toml: [{repo or forum, reason, date}]."""
+    if not REMOVED.exists():
+        return []
+    return tomllib.loads(REMOVED.read_text(encoding="utf-8")).get("removed", [])
+
+
+def find_removed(entries, removed):
+    """Problems for entries that were removed before. They come back only by deleting the removed.toml entry."""
+    gone = {key: r for r in removed for key in link_key(r)}
+    errors = []
+    for stem, entry in sorted(entries.items()):
+        for key in link_key(entry):
+            if key in gone:
+                r = gone[key]
+                errors.append((stem, f"this was removed on {r.get('date', '?')}: {r.get('reason', 'no reason given')}. "
+                                     "If that has changed, delete its entry in removed.toml in the same pull request."))
+    return errors
 
 
 # --- fetching --------------------------------------------------------------

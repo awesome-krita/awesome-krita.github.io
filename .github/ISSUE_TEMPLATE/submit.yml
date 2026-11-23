@@ -68,6 +68,12 @@ body:
       options: [Windows, macOS, Linux, Android]
     validations:
       required: true
+  - type: input
+    id: min_krita
+    attributes:
+      label: Minimum Krita version
+      description: Optional. The oldest Krita it needs, if the author says so, like 5.2.2.
+      placeholder: "5.2"
   - type: textarea
     id: notes
     attributes:

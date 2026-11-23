@@ -51,6 +51,12 @@ body:
       description: Replaces the current list. Only systems someone actually tried.
       multiple: true
       options: [Windows, macOS, Linux, Android]
+  - type: input
+    id: min_krita
+    attributes:
+      label: Minimum Krita version
+      description: Optional. The oldest Krita it needs, if the author says so, like 5.2.2.
+      placeholder: "5.2"
   - type: textarea
     id: preview
     attributes:

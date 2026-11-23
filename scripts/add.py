@@ -48,6 +48,7 @@ def parse_issue(body):
         "name": answers.get("Display name", ""),
         "image": first_link(answers.get("Preview", "")),
         "download": answers.get("Download link", "").strip(),
+        "min_krita": answers.get("Minimum Krita version", "").strip(),
     }
 
 
@@ -57,8 +58,10 @@ def first_link(text):
     return m[0] if m else ""
 
 
-def make_entry(links, type_, category, krita=(), os=(), name="", image="", download=""):
+def make_entry(links, type_, category, krita=(), os=(), name="", image="", download="", min_krita=""):
     entry = {"type": type_, "category": list(category)}
+    if min_krita:
+        entry["min_krita"] = min_krita
     if download:
         entry["download"] = download
     if name:
@@ -87,7 +90,8 @@ def to_toml(entry):
     def value(v):  # JSON strings are valid TOML strings, quotes and all
         return "[" + ", ".join(json.dumps(x, ensure_ascii=False) for x in v) + "]" if isinstance(v, list) \
             else json.dumps(v, ensure_ascii=False)
-    order = ["repo", "forum", "name", "description", "author", "type", "category", "krita", "os", "download", "image"]
+    order = ["repo", "forum", "name", "description", "author", "type", "category", "krita", "os", "min_krita",
+             "download", "image"]
     keys = [k for k in order if k in entry] + sorted(k for k in entry if k not in order)
     return "".join(f"{k} = {value(entry[k])}\n" for k in keys)
 
@@ -107,7 +111,7 @@ def main():
         if not answers["krita"] or not answers["os"]:
             raise SystemExit("Pick at least one Krita version and one system it was tested on.")
         entry = make_entry(answers["links"], answers["type"], answers["category"], answers["krita"], answers["os"],
-                           answers["name"], answers["image"], answers["download"])
+                           answers["name"], answers["image"], answers["download"], answers["min_krita"])
     else:
         entry = make_entry(args.links, args.type, args.category, args.krita, args.os)
 
@@ -120,6 +124,10 @@ def main():
     dup = [msg for stem, msg in build.find_duplicates(entries | {"~new": entry}) if stem == "~new"]
     if dup:
         raise SystemExit("Already listed: " + dup[0].removeprefix("same link as "))
+    gone = build.find_removed({"~new": entry}, build.load_removed())
+    if gone:
+        raise SystemExit("This " + gone[0][1].removeprefix("this ").split(". If that", 1)[0]
+                         + ". Ask in an issue if you think it should come back.")
 
     info = build.fetch(entry)
     stem = file_name(info["name"])

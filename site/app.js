@@ -138,6 +138,7 @@ function chips(entry) {
     entry.stars != null && chip("star", String(entry.stars), "GitHub stars", "minor"),
     entry.krita && chip("krita", entry.krita.join(", "), "Tested in Krita", "minor"),
     entry.os && chip("monitor", entry.os.join(", "), "Tested on", "minor"),
+    entry.min_krita && chip("krita", `Needs ${entry.min_krita}+`, "Minimum Krita version"),
     entry.updated && chip("calendar", formatDate(entry.updated), "Last updated", "minor"),
     entry.archived && el("li", { class: "chip warn", text: "Archived" }),
     staleSince(entry) && el("li", { class: "chip stale", title: `No changes for over ${STALE_YEARS} years. It may still work.`,

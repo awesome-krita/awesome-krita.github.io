@@ -87,6 +87,45 @@ class Validate(unittest.TestCase):
         self.assertTrue(self.check(GOOD | {"download": "http://example.com/a.zip"}))
 
 
+class MinKrita(unittest.TestCase):
+    def test_formats(self):
+        for good in ["5.2", "5.2.2", "6.0"]:
+            with self.subTest(good):
+                self.assertEqual(build.validate(GOOD | {"min_krita": good}, "x"), [])
+        for bad in ["5", "5.2+", "v5.2", "latest", "5.2.2.1"]:
+            with self.subTest(bad):
+                self.assertIn("min_krita", build.validate(GOOD | {"min_krita": bad}, "x")[0])
+
+    def test_from_forms(self):
+        body = RealSubmission.BODY.replace("### Type", "### Minimum Krita version\n\n5.2.2\n\n### Type")
+        a = add.parse_issue(body)
+        entry = add.make_entry(a["links"], a["type"], a["category"], a["krita"], a["os"], min_krita=a["min_krita"])
+        self.assertEqual(entry["min_krita"], "5.2.2")
+        self.assertIn('min_krita = "5.2.2"', add.to_toml(entry))
+        self.assertEqual(edit.changes_from({"Minimum Krita version": "5.3"}), {"min_krita": "5.3"})
+
+
+class Removed(unittest.TestCase):
+    REMOVED = [{"repo": "https://github.com/bad/tool", "reason": "Download replaced by another program.", "date": "2026-11-23"},
+               {"forum": "https://krita-artists.org/t/x/999", "reason": "Gone."}]
+
+    def test_removed_repo_comes_back(self):
+        entry = GOOD | {"repo": "https://github.com/Bad/Tool/"}
+        errors = build.find_removed({"tool": entry}, self.REMOVED)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("removed on 2026-11-23: Download replaced by another program.", errors[0][1])
+
+    def test_removed_forum_topic(self):
+        entry = {"forum": "https://krita-artists.org/t/x/999/3", "type": "plugin", "category": ["color"]}
+        self.assertEqual(len(build.find_removed({"x": entry}, self.REMOVED)), 1)
+
+    def test_others_are_fine(self):
+        self.assertEqual(build.find_removed({"sc": GOOD}, self.REMOVED), [])
+
+    def test_removed_file_is_valid(self):
+        self.assertIsInstance(build.load_removed(), list)
+
+
 class Duplicates(unittest.TestCase):
     def test_same_repo_any_case(self):
         other = GOOD | {"repo": "https://github.com/WOJTRYB/shortcut-composer/"}
@@ -363,6 +402,11 @@ class InSync(unittest.TestCase):
         for field in ("type", "category", "krita", "os"):
             with self.subTest(field):
                 self.assertEqual(self.form_options(field, "edit.yml"), self.form_options(field))
+
+    def test_forms_ask_for_min_krita(self):
+        for form in ("submit.yml", "edit.yml"):
+            with self.subTest(form):
+                self.assertIn("label: Minimum Krita version", (self.ROOT / ".github/ISSUE_TEMPLATE" / form).read_text())
 
     def test_forms_ask_for_a_download_link(self):
         for form in ("submit.yml", "edit.yml"):

@@ -88,6 +88,7 @@ How to review entries, handle reports and fix a failed build: [MAINTAINING.md](M
 | Path | What it does |
 |---|---|
 | `entries/` | One `.toml` file per entry |
+| `removed.toml` | Entries taken off the list on purpose, with the reason. They can't be added again by accident |
 | `scripts/build.py` | Checks the entries, reads the details, writes `site/data.json` |
 | `scripts/add.py` | Makes a new entry file from a link |
 | `scripts/edit.py` | Changes an entry from an edit request |

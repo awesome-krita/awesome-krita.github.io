@@ -26,6 +26,7 @@ def changes_from(answers):
         "os": add.split(get("Tested on")),
         "image": add.first_link(get("Preview")),
         "download": get("Download link"),
+        "min_krita": get("Minimum Krita version"),
     }
     return {k: v for k, v in changes.items() if v}
 

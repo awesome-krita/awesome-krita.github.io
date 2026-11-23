@@ -45,7 +45,18 @@ Nothing is removed only because of a report.
 | It's not made for Krita | Check, then remove the entry file if it's true |
 | Harmful | Comes in through private reporting, not issues. Remove the entry right away, then look into it. |
 
-To remove an entry, delete its file in `entries/` in a pull request and say why.
+To remove an entry, delete its file in `entries/` in a pull request. In the same pull request, add it to `removed.toml` with the reason and the date, so it can't be added again by accident:
+
+```toml
+[[removed]]
+repo = "https://github.com/owner/name"
+reason = "Download replaced by a different program."
+date = "2026-11-23"
+```
+
+To bring one back, delete its block in `removed.toml` in the pull request that adds it again.
+
+Removing an entry only because it's old or unmaintained doesn't need a `removed.toml` block. That's for entries that shouldn't come back.
 
 ## When the daily build fails
 

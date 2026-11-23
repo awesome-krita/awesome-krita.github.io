@@ -1,0 +1,7 @@
+# Entries taken off the list on purpose. The build refuses them if someone adds them again.
+# To bring one back, delete its block here in the same pull request that adds it.
+#
+# [[removed]]
+# repo = "https://github.com/owner/name"    # or forum = "https://krita-artists.org/t/name/12345"
+# reason = "Download replaced by a different program."
+# date = "2026-11-23"
