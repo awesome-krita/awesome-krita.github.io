@@ -202,6 +202,20 @@ def first_image(markdown, base):
     return None
 
 
+def fork_hint(readme, own_url):
+    """The original repo a README says this one was forked from, or None.
+    Catches copies GitHub doesn't mark as forks: a line that says fork and links to another repo."""
+    own = own_url.lower().rstrip("/")
+    for line in readme.splitlines():
+        if not re.search(r"\bfork(ed|s)?\b", line, re.I):
+            continue
+        for owner, name in re.findall(r"https://github\.com/([\w.-]+)/([\w.-]+)", line):
+            other = f"https://github.com/{owner}/{name.removesuffix('.git')}".rstrip(".")
+            if other.lower() != own:
+                return other
+    return None
+
+
 def short_text(html, limit=MAX_DESCRIPTION):
     """The first paragraph of a forum post, cut at a word."""
     paragraph = re.search(r"<p>(.*?)</p>", html, re.S)
@@ -224,6 +238,7 @@ def from_github(owner, name):
         "stars": repo["stargazers_count"],
         "updated": repo["pushed_at"][:10],
         "archived": repo["archived"],
+        "fork_of": (repo.get("parent") or {}).get("html_url") if repo.get("fork") else None,
     }
     if info["license"] == "NOASSERTION":
         info["license"] = None
@@ -248,6 +263,7 @@ def from_github(owner, name):
         readme = get(f"https://api.github.com/repos/{owner}/{name}/readme", "application/vnd.github.raw").decode("utf-8", "replace")
         base = f"https://raw.githubusercontent.com/{owner}/{name}/{repo['default_branch']}/"
         info["image"] = first_image(readme, base)
+        info["fork_of"] = info["fork_of"] or fork_hint(readme, url)
     except urllib.error.HTTPError as e:
         if e.code != 404:
             raise
@@ -310,6 +326,9 @@ def main():
         except (urllib.error.URLError, KeyError, ValueError) as e:
             failed.append(f"entries/{stem}.toml: could not read its links ({e})")
             continue
+        # Forks aren't listed for now: the original should be listed instead.
+        if fork_of := info.pop("fork_of", None):
+            failed.append(f"entries/{stem}.toml: this repo is a fork of {fork_of}. Forks aren't listed, add the original instead.")
         if not link_works(info["download"]):
             failed.append(f"entries/{stem}.toml: download link does not work: {info['download']}")
         if info.get("image"):
