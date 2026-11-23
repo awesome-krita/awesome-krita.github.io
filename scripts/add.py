@@ -122,6 +122,8 @@ def main():
         raise SystemExit("Already listed: " + dup[0].removeprefix("same link as "))
 
     info = build.fetch(entry)
+    if info.get("fork_of"):
+        raise SystemExit(f"This repo is a fork of {info['fork_of']}. Forks aren't listed for now, submit the original instead.")
     stem = file_name(info["name"])
     path = build.ENTRIES / f"{stem}.toml"
     if path.exists():
