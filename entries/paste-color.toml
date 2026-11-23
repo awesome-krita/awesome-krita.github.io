@@ -1,0 +1,7 @@
+repo = "https://github.com/emarpiee/krita-paste-color"
+name = "Paste Color"
+description = "Paste a copied color (hex, CSS rgb, hsl, oklch and more) to set the foreground or background color. Ctrl+V still pastes images."
+type = "plugin"
+category = ["color"]
+krita = ["5.3"]
+os = ["Linux"]
