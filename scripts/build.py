@@ -326,9 +326,9 @@ def main():
         except (urllib.error.URLError, KeyError, ValueError) as e:
             failed.append(f"entries/{stem}.toml: could not read its links ({e})")
             continue
-        # Forks aren't listed for now: the original should be listed instead.
+        # Forks may be listed. Say so, so a reviewer can check it adds something to the original.
         if fork_of := info.pop("fork_of", None):
-            failed.append(f"entries/{stem}.toml: this repo is a fork of {fork_of}. Forks aren't listed, add the original instead.")
+            print(f"note: entries/{stem}.toml is a fork of {fork_of}", file=sys.stderr)
         if not link_works(info["download"]):
             failed.append(f"entries/{stem}.toml: download link does not work: {info['download']}")
         if info.get("image"):
